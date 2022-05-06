@@ -24,9 +24,6 @@ interface CircleProps {
 }
 
 function Circle({ bgColor, borderColor, text = "" }: CircleProps) {
-  const [counter, setCounter] = useState<number | string>(1);
-  setCounter("");
-
   return (
     <Container bgColor={bgColor} borderColor={borderColor ?? "none"}>
       {text}

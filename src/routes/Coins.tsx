@@ -87,7 +87,7 @@ const Coins = () => {
         <CoinsList>
           {coins.map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`} state={{ name: coin.symbol }}>
+              <Link to={`/${coin.id}`} state={{ name: coin.name }}>
                 <CoinIcon
                   src={`https://raw.githubusercontent.com/TokenTax/cryptoicon-api/master/public/icons/128/color/${coin.symbol.toLowerCase()}.png`}
                   alt={coin.symbol}

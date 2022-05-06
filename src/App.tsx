@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import Circle from "./Circle";
 
+const Container = styled.div`
+  background-color: ${(props) => props.theme.bgColor};
+`;
+const H1 = styled.h1`
+  color: ${(props) => props.theme.textColor};
+`;
+
 function App() {
   const [username, setUsername] = useState("");
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,6 +29,9 @@ function App() {
         <input type="text" placeholder="username" value={username} onChange={onChange} required />
         <button>Log In</button>
       </form>
+      <Container>
+        <H1>TYPE</H1>
+      </Container>
     </>
   );
 }

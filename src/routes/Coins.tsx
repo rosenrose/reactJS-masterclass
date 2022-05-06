@@ -20,6 +20,10 @@ const Title = styled.h1`
   font-size: 3rem;
 `;
 
+const Loader = styled.p`
+  text-align: center;
+`;
+
 const CoinsList = styled.ul`
   display: flex;
   flex-direction: column;
@@ -32,8 +36,10 @@ const Coin = styled.li`
   border-radius: 1rem;
 
   a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     padding: 1rem;
-    display: block;
     transition: color 0.2s ease-in;
 
     &:hover {
@@ -42,8 +48,9 @@ const Coin = styled.li`
   }
 `;
 
-const Loader = styled.p`
-  text-align: center;
+const CoinIcon = styled.img`
+  width: 1.5rem;
+  height: 1.5rem;
 `;
 
 interface CoinInterface {
@@ -80,7 +87,13 @@ const Coins = () => {
         <CoinsList>
           {coins.map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`}>{coin.name} &rarr;</Link>
+              <Link to={`/${coin.id}`} state={{ name: coin.symbol }}>
+                <CoinIcon
+                  src={`https://raw.githubusercontent.com/TokenTax/cryptoicon-api/master/public/icons/128/color/${coin.symbol.toLowerCase()}.png`}
+                  alt={coin.symbol}
+                />
+                {coin.name} &rarr;
+              </Link>
             </Coin>
           ))}
         </CoinsList>

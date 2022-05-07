@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Outlet, Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -22,6 +22,53 @@ const Title = styled.h1`
 
 const Loader = styled.p`
   text-align: center;
+`;
+
+const Overview = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem 1.2rem;
+  border-radius: 1rem;
+`;
+
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  span:first-child {
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+`;
+
+const Description = styled.p`
+  margin: 1.2rem 0;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 1.5rem 0;
+  gap: 1rem;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  padding: 0.5rem 0;
+  border-radius: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: ${(props) => props.theme[props.isActive ? "accentColor" : "textColor"]};
+
+  a {
+    display: block;
+  }
 `;
 
 // interface Params {
@@ -53,14 +100,18 @@ interface Info {
   org_structure: string;
   hash_algorithm: string;
   links: {
-    explorer: string;
-    facebook: string;
-    reddit: string;
-    source_code: string;
-    website: string;
-    youtube: string;
+    explorer: string[];
+    facebook: string[];
+    reddit: string[];
+    source_code: string[];
+    website: string[];
+    youtube: string[];
   };
-  links_extended: { url: string; type: string }[];
+  links_extended: {
+    url: string;
+    type: string;
+    status?: { subscribers?: number; contributors?: number; stars?: number; followers?: number };
+  }[];
   whitepaper: { link: string; thumbnail: string };
   first_data_at: string;
   last_data_at: string;
@@ -111,23 +162,67 @@ const Coin = () => {
   const [info, setInfo] = useState<Info>();
   const [price, setPrice] = useState<Price>();
 
+  const priceMatch = useMatch("/:coinId/price");
+  const chartMatch = useMatch("/:coinId/chart");
+  // console.log(priceMatch);
+
   useEffect(() => {
     Promise.all([
       fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`).then((response) => response.json()),
       fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`).then((response) => response.json()),
     ]).then(([infoData, priceData]) => {
+      // console.log(infoData, priceData);
       setInfo(infoData);
       setPrice(priceData);
       setIsLoading(false);
     });
-  }, []);
+  }, [coinId]);
 
   return (
     <Container>
       <Header>
-        <Title>{location.state?.name || "Loading..."}</Title>
+        <Title>{location.state?.name || (isLoading ? "Loading..." : info?.name)}</Title>
       </Header>
-      {isLoading ? <Loader>Loading</Loader> : <h2>{info?.type}</h2>}
+      {isLoading ? (
+        <Loader>Loading</Loader>
+      ) : (
+        <>
+          <Overview>
+            <OverviewItem>
+              <span>Rank:</span>
+              <span>{info?.rank}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Rank:</span>
+              <span>{info?.symbol}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Open Source:</span>
+              <span>{info?.open_source ? "Yes" : "No"}</span>
+            </OverviewItem>
+          </Overview>
+          <Description>{info?.description}</Description>
+          <Overview>
+            <OverviewItem>
+              <span>Total Suply:</span>
+              <span>{price?.total_supply}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Max Supply:</span>
+              <span>{price?.max_supply}</span>
+            </OverviewItem>
+          </Overview>
+          <Tabs>
+            <Tab isActive={priceMatch !== null}>
+              <Link to="price">Price</Link>
+            </Tab>
+            <Tab isActive={chartMatch !== null}>
+              <Link to="chart">Chart</Link>
+            </Tab>
+          </Tabs>
+          <Outlet />
+        </>
+      )}
     </Container>
   );
 };
@@ -137,13 +232,21 @@ export default Coin;
 // function getTypes(obj) {
 //   if (typeof obj === "object") {
 //     if (Array.isArray(obj)) {
-//       return getTypes(obj[0]) + "[]";
+//       let types = [...new Set(obj.map((e) => getTypes(e)))];
+
+//       if (types.length === 1) {
+//         types = types[0];
+//       } else {
+//         types = `(${types.join(" | ")})`;
+//       }
+
+//       return `${types}[]`;
 //     } else {
 //       return JSON.stringify(
 //         Object.fromEntries(Object.entries(obj).map(([key, val]) => [key, getTypes(val)]))
 //       )
-//         .replace(/"(boolean|string|number)(\[\])?"/g, "$1")
-//         .replace(/\\|"(?=\{)|(?<=(\}|\]))"/g, "");
+//         .replace(/"((boolean|string|number)(\[\])?)"/g, "$1")
+//         .replace(/\\|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
 //     }
 //   } else {
 //     return typeof obj;

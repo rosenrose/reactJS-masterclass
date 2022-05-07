@@ -3,6 +3,7 @@ import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
 import Price from "./routes/Price";
 import Chart from "./routes/Chart";
+import GetTypes from "./GetTypes";
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
           <Route path="price" element={<Price />} />
           <Route path="chart" element={<Chart />} />
         </Route>
+        <Route path="/getTypes" element={<GetTypes />} />
       </Routes>
     </BrowserRouter>
   );

@@ -112,17 +112,14 @@ const Coin = () => {
   const [price, setPrice] = useState<Price>();
 
   useEffect(() => {
-    fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      .then((response) => response.json())
-      .then((infoData) => {
-        setInfo(infoData);
-        return fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`);
-      })
-      .then((response) => response.json())
-      .then((priceData) => {
-        setPrice(priceData);
-        setIsLoading(false);
-      });
+    Promise.all([
+      fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`).then((response) => response.json()),
+      fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`).then((response) => response.json()),
+    ]).then(([infoData, priceData]) => {
+      setInfo(infoData);
+      setPrice(priceData);
+      setIsLoading(false);
+    });
   }, []);
 
   return (

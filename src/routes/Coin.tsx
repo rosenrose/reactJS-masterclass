@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { useLocation, useParams, Outlet, Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
+import { fetchCoinInfo, fetchCoinPrice } from "../api";
 
 const Container = styled.div`
   padding: 0 1.2rem;
@@ -72,7 +74,7 @@ const Tab = styled.span<{ isActive: boolean }>`
 `;
 
 // interface Params {
-//   coinId:string
+//   coinId: string;
 // }
 interface Location {
   state: {
@@ -158,25 +160,17 @@ const Coin = () => {
   const location = useLocation() as Location;
   // console.log(location);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [info, setInfo] = useState<Info>();
-  const [price, setPrice] = useState<Price>();
+  const { isLoading: isInfoLoading, data: info } = useQuery<Info>(["info", coinId], () =>
+    fetchCoinInfo(coinId!)
+  );
+  const { isLoading: isPriceLoading, data: price } = useQuery<Price>(["price", coinId], () =>
+    fetchCoinPrice(coinId!)
+  );
+  const isLoading = isInfoLoading || isPriceLoading;
 
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
   // console.log(priceMatch);
-
-  useEffect(() => {
-    Promise.all([
-      fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`).then((response) => response.json()),
-      fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`).then((response) => response.json()),
-    ]).then(([infoData, priceData]) => {
-      // console.log(infoData, priceData);
-      setInfo(infoData);
-      setPrice(priceData);
-      setIsLoading(false);
-    });
-  }, [coinId]);
 
   return (
     <Container>
@@ -228,28 +222,3 @@ const Coin = () => {
 };
 
 export default Coin;
-
-// function getTypes(obj) {
-//   if (typeof obj === "object") {
-//     if (Array.isArray(obj)) {
-//       let types = [...new Set(obj.map((e) => getTypes(e)))];
-
-//       if (types.length === 1) {
-//         types = types[0];
-//       } else {
-//         types = `(${types.join(" | ")})`;
-//       }
-
-//       return `${types}[]`;
-//     } else {
-//       return JSON.stringify(
-//         Object.fromEntries(Object.entries(obj).map(([key, val]) => [key, getTypes(val)]))
-//       )
-//         .replace(/"((boolean|string|number)(\[\])?)"/g, "$1")
-//         .replace(/\\|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
-//     }
-//   } else {
-//     return typeof obj;
-//   }
-// }
-// getTypes(temp1);

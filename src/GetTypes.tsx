@@ -44,8 +44,8 @@ function getTypes(obj: object): string {
         null,
         2
       )
-        .replace(/"((boolean|string|number)(\[\])?)"/g, "$1")
-        .replace(/\\n?\s?|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
+        .replace(/"((boolean|string|number|undefined)(\[\])?)"/g, "$1")
+        .replace(/\s?\\n?\s?|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
     }
   } else {
     return typeof obj;

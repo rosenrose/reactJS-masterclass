@@ -68,24 +68,3 @@ function getTypes(obj: object): string {
 }
 
 export default GetTypes;
-
-export type Entry = [string, boolean | string | number | [Entry]];
-
-function objectToEntries(obj: object): any {
-  if (typeof obj === "object") {
-    if (Array.isArray(obj)) {
-      return obj.map((value) => objectToEntries(value));
-    } else {
-      return Object.entries(obj).map(([key, value]) => [
-        key,
-        typeof value === "object"
-          ? Array.isArray(value)
-            ? value.map((val) => objectToEntries(val))
-            : objectToEntries(value)
-          : value,
-      ]);
-    }
-  } else {
-    return obj;
-  }
-}

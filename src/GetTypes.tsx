@@ -1,24 +1,39 @@
-import { useState } from "react";
+import { useQueries } from "react-query";
+import { ObjectToDetails } from "./routes/Price";
 
 const GetTypes = () => {
-  const [a, b] = useState("");
-  const [c, d] = useState("");
+  const result = useQueries([
+    {
+      queryKey: "0",
+      queryFn: () =>
+        fetch(`https://api.coinpaprika.com/v1/coins/btc-bitcoin`).then((response) =>
+          response.json()
+        ),
+    },
+    {
+      queryKey: "1",
+      queryFn: () =>
+        fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`).then((response) =>
+          response.json()
+        ),
+    },
+  ]);
 
-  fetch(`https://api.coinpaprika.com/v1/coins/btc-bitcoin`)
-    .then((response) => response.json())
-    .then((json) => {
-      b(getTypes(json));
-    });
-  fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`)
-    .then((response) => response.json())
-    .then((json) => {
-      d(getTypes(json));
-    });
+  console.log("0", result[0].data);
+  // console.log("1", result[1].data);
+  // console.log("0", objectToEntries(result[0].data));
+  // console.log("1", objectToEntries(result[1].data));
 
   return (
     <>
-      <pre>{a}</pre>
-      <pre>{c}</pre>
+      {result.map((r) => r.isLoading).every((isLoading) => !isLoading) && (
+        <>
+          <pre>{getTypes(result[0].data)}</pre>
+          <pre>{getTypes(result[1].data)}</pre>
+          <ObjectToDetails obj={result[0].data} />
+          <ObjectToDetails obj={result[1].data} />
+        </>
+      )}
     </>
   );
 };
@@ -56,9 +71,21 @@ export default GetTypes;
 
 export type Entry = [string, boolean | string | number | [Entry]];
 
-export function objectToEntries(obj: object): Entry[] {
-  return Object.entries(obj).map(([key, value]) => [
-    key,
-    typeof value === "object" && !Array.isArray(value) ? objectToEntries(value) : value,
-  ]);
+function objectToEntries(obj: object): any {
+  if (typeof obj === "object") {
+    if (Array.isArray(obj)) {
+      return obj.map((value) => objectToEntries(value));
+    } else {
+      return Object.entries(obj).map(([key, value]) => [
+        key,
+        typeof value === "object"
+          ? Array.isArray(value)
+            ? value.map((val) => objectToEntries(val))
+            : objectToEntries(value)
+          : value,
+      ]);
+    }
+  } else {
+    return obj;
+  }
 }

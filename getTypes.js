@@ -30,17 +30,29 @@ function getTypes(obj) {
 fetch(`https://api.coinpaprika.com/v1/coins/btc-bitcoin`)
   .then((response) => response.json())
   .then((json) => {
-    console.log(getTypes(json));
+    console.log(json, getTypes(json), objectToEntries(json));
   });
 fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`)
   .then((response) => response.json())
   .then((json) => {
-    console.log(getTypes(json));
+    console.log(json, getTypes(json), objectToEntries(json));
   });
 
 function objectToEntries(obj) {
-  return Object.entries(obj).map(([key, value]) => [
-    key,
-    typeof value === "object" && !Array.isArray(value) ? objectToEntries(value) : value,
-  ]);
+  if (typeof obj === "object") {
+    if (Array.isArray(obj)) {
+      return obj.map((value) => objectToEntries(value));
+    } else {
+      return Object.entries(obj).map(([key, value]) => [
+        key,
+        typeof value === "object"
+          ? Array.isArray(value)
+            ? value.map((val) => objectToEntries(val))
+            : objectToEntries(value)
+          : value,
+      ]);
+    }
+  } else {
+    return obj;
+  }
 }

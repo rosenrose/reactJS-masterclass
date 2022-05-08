@@ -1,25 +1,26 @@
 function getTypes(obj) {
   if (typeof obj === "object") {
     if (Array.isArray(obj)) {
-      let types = [...new Set(obj.map((e) => getTypes(e)))];
+      const types = Array.from(new Set(obj.map((e) => getTypes(e))));
+      let result = "";
 
       if (types.length === 0) {
-        types = "undefined";
+        result = "undefined";
       } else if (types.length === 1) {
-        types = types[0];
+        result = types[0];
       } else {
-        types = `(${types.join(" | ")})`;
+        result = `(${types.join(" | ")})`;
       }
 
-      return `${types}[]`;
+      return `${result}[]`;
     } else {
       return JSON.stringify(
         Object.fromEntries(Object.entries(obj).map(([key, val]) => [key, getTypes(val)])),
         null,
         2
       )
-        .replace(/"((boolean|string|number)(\[\])?)"/g, "$1")
-        .replace(/\\n?|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
+        .replace(/"((boolean|string|number|undefined)(\[\])?)"/g, "$1")
+        .replace(/\s?\\n?\s?|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
     }
   } else {
     return typeof obj;
@@ -36,3 +37,10 @@ fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`)
   .then((json) => {
     console.log(getTypes(json));
   });
+
+function objectToEntries(obj) {
+  return Object.entries(obj).map(([key, value]) => [
+    key,
+    typeof value === "object" && !Array.isArray(value) ? objectToEntries(value) : value,
+  ]);
+}

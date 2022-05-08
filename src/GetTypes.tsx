@@ -53,3 +53,12 @@ function getTypes(obj: object): string {
 }
 
 export default GetTypes;
+
+export type Entry = [string, boolean | string | number | [Entry]];
+
+export function objectToEntries(obj: object): Entry[] {
+  return Object.entries(obj).map(([key, value]) => [
+    key,
+    typeof value === "object" && !Array.isArray(value) ? objectToEntries(value) : value,
+  ]);
+}

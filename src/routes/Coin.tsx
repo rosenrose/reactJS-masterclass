@@ -1,7 +1,10 @@
 import { useQuery } from "react-query";
-import { useLocation, useParams, Outlet, Link, useMatch } from "react-router-dom";
+import { useLocation, useParams, Routes, Route, Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
+import { Helmet } from "react-helmet";
 import { fetchCoinInfo, fetchCoinPrice } from "../api";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Container = styled.div`
   padding: 0 1.2rem;
@@ -72,6 +75,14 @@ const Tab = styled.span<{ isActive: boolean }>`
   }
 `;
 
+const HomeBtn = styled.button`
+  margin: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
 // interface Params {
 //   coinId: string;
 // }
@@ -81,7 +92,7 @@ interface Location {
   };
 }
 
-interface Info {
+interface IInfo {
   id: string;
   name: string;
   symbol: string;
@@ -118,7 +129,7 @@ interface Info {
   last_data_at: string;
 }
 
-interface Price {
+export interface IPrice {
   id: string;
   name: string;
   symbol: string;
@@ -159,11 +170,13 @@ const Coin = () => {
   const location = useLocation() as Location;
   // console.log(location);
 
-  const { isLoading: isInfoLoading, data: info } = useQuery<Info>(["info", coinId], () =>
+  const { isLoading: isInfoLoading, data: info } = useQuery<IInfo>(["info", coinId], () =>
     fetchCoinInfo(coinId!)
   );
-  const { isLoading: isPriceLoading, data: price } = useQuery<Price>(["price", coinId], () =>
-    fetchCoinPrice(coinId!)
+  const { isLoading: isPriceLoading, data: price } = useQuery<IPrice>(
+    ["price", coinId],
+    () => fetchCoinPrice(coinId!),
+    { refetchInterval: 1000 * 60 }
   );
   const isLoading = isInfoLoading || isPriceLoading;
 
@@ -173,9 +186,15 @@ const Coin = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>{location.state?.name || (isLoading ? "Loading..." : info?.name)}</title>
+      </Helmet>
       <Header>
         <Title>{location.state?.name || (isLoading ? "Loading..." : info?.name)}</Title>
       </Header>
+      <Link to="/">
+        <HomeBtn>&larr;</HomeBtn>
+      </Link>
       {isLoading ? (
         <Loader>Loading</Loader>
       ) : (
@@ -190,8 +209,8 @@ const Coin = () => {
               <span>{info?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>${price?.quotes.USD.price}</span>
             </OverviewItem>
           </Overview>
           <Description>{info?.description}</Description>
@@ -206,14 +225,17 @@ const Coin = () => {
             </OverviewItem>
           </Overview>
           <Tabs>
-            <Tab isActive={priceMatch !== null}>
-              <Link to="price">Price</Link>
-            </Tab>
             <Tab isActive={chartMatch !== null}>
               <Link to="chart">Chart</Link>
             </Tab>
+            <Tab isActive={priceMatch !== null}>
+              <Link to="price">Price</Link>
+            </Tab>
           </Tabs>
-          <Outlet />
+          <Routes>
+            <Route path="chart" element={<Chart coinId={coinId!} />} />
+            <Route path="price" element={<Price coinId={coinId!} price={price!} />} />
+          </Routes>
         </>
       )}
     </Container>

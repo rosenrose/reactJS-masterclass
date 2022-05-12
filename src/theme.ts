@@ -11,5 +11,5 @@ export const lightTheme: DefaultTheme = {
   textColor: "black",
   bgColor: "whitesmoke",
   accentColor: "#44bd32",
-  accentBgColor: "#273c75",
+  accentBgColor: "#fbc531",
 };

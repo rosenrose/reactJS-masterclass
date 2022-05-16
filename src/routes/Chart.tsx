@@ -33,7 +33,7 @@ const Chart = ({ coinId }: ChartProps) => {
             type="line"
             series={[
               {
-                data: data?.map((price) => price.close)!,
+                data: data!.map((price) => price.close)!,
                 name: "Close Price",
               },
             ]}
@@ -52,7 +52,7 @@ const Chart = ({ coinId }: ChartProps) => {
                 axisTicks: { show: false },
                 axisBorder: { show: false },
                 type: "datetime",
-                categories: data?.map((price) => price.time_close),
+                categories: data!.map((price) => price.time_close),
               },
               yaxis: { labels: { formatter: (value) => value.toFixed(0) } },
               fill: {
@@ -71,10 +71,10 @@ const Chart = ({ coinId }: ChartProps) => {
             type="candlestick"
             series={[
               {
-                data: data?.map((price) => ({
+                data: data!.map((price) => ({
                   x: price.time_close,
                   y: [price.open, price.high, price.low, price.close],
-                }))!,
+                })),
               },
             ]}
             options={{

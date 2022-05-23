@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { createGlobalStyle, DefaultTheme, ThemeProvider } from "styled-components";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { ReactQueryDevtools } from "react-query/devtools";
 import Router from "./Routes";
 import { darkTheme, lightTheme } from "./theme";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { isDarkAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
   @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap");
@@ -71,17 +72,12 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
-  const [theme, setTheme] = useState<DefaultTheme>(darkTheme);
+  const isDark = useRecoilValue(isDarkAtom);
+  const setIsDark = useSetRecoilState(isDarkAtom);
 
   return (
-    <ThemeProvider theme={theme}>
-      <button
-        onClick={() =>
-          setTheme((current: DefaultTheme) => (current === lightTheme ? darkTheme : lightTheme))
-        }
-      >
-        change
-      </button>
+    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+      <button onClick={() => setIsDark((prev) => !prev)}>toggle theme</button>
       <GlobalStyle />
       <Router />
       {/* <ReactQueryDevtools initialIsOpen={true} /> */}

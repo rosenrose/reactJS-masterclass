@@ -1,16 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { RecoilRoot } from "recoil";
-import { ThemeProvider } from "styled-components";
 import App from "./App";
-import { darkTheme } from "./theme";
+
+const client = new QueryClient();
 
 ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
   <React.StrictMode>
     <RecoilRoot>
-      <ThemeProvider theme={darkTheme}>
+      <QueryClientProvider client={client}>
         <App />
-      </ThemeProvider>
+      </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>
 );

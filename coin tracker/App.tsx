@@ -1,5 +1,9 @@
-import { createGlobalStyle } from "styled-components";
-import TodoList from "./TodoList";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { ReactQueryDevtools } from "react-query/devtools";
+import Router from "./Routes";
+import { darkTheme, lightTheme } from "./theme";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { isDarkAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
   @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap");
@@ -68,11 +72,16 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  const isDark = useRecoilValue(isDarkAtom);
+  const setIsDark = useSetRecoilState(isDarkAtom);
+
   return (
-    <>
+    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+      <button onClick={() => setIsDark((prev) => !prev)}>toggle theme</button>
       <GlobalStyle />
-      <TodoList />
-    </>
+      <Router />
+      {/* <ReactQueryDevtools initialIsOpen={true} /> */}
+    </ThemeProvider>
   );
 }
 

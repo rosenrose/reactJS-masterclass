@@ -7,10 +7,10 @@ export interface IForm {
 }
 
 const CreateTodo = () => {
-  const { register, handleSubmit, setValue } = useForm<IForm>();
   const setTodos = useSetRecoilState(todoState);
   const category = useRecoilValue(categoryState);
 
+  const { register, handleSubmit, setValue } = useForm<IForm>();
   const onSubmit = (data: IForm) => {
     // console.log(data.todo);
     setValue("todo", "");

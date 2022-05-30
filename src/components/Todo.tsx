@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useSetRecoilState } from "recoil";
-import { ITodo, todoState } from "../atoms";
+import { ITodo, todoState, Categories } from "../atoms";
 
 const Todo = ({ text, category, id }: ITodo) => {
   const setTodos = useSetRecoilState(todoState);
@@ -9,14 +9,14 @@ const Todo = ({ text, category, id }: ITodo) => {
     const target = event.target as HTMLButtonElement;
 
     if (target.matches("button")) {
-      const name = target.name as ITodo["category"];
+      const name = target.name as Categories;
       // console.log(target.name);
 
       setTodos((prev) => {
         const next = [...prev];
         const index = next.findIndex((todo) => todo.id === id)!;
         next[index] = { text, id, category: name };
-        // console.log("next", next);
+        console.log("next", next);
 
         return next;
       });
@@ -26,9 +26,9 @@ const Todo = ({ text, category, id }: ITodo) => {
   return (
     <li onClick={onClick}>
       <span>{text}</span>
-      {category !== "TO_DO" && <button name="TO_DO">To do</button>}
-      {category !== "DOING" && <button name="DOING">Doing</button>}
-      {category !== "DONE" && <button name="DONE">Done</button>}
+      {Object.entries(Categories).map(([key, value]) => (
+        <Fragment key={key}>{category !== value && <button name={value}>{value}</button>}</Fragment>
+      ))}
     </li>
   );
 };

@@ -1,16 +1,16 @@
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import CreateTodo from "./CreateTodo";
 import Todo from "./Todo";
-import { categoryState, todoSelector, todoState, ITodo } from "../atoms";
+import { categoryState, todoSelector, todoState, Categories } from "../atoms";
 import React from "react";
 
 const TodoList = () => {
   // const todos = useRecoilValue(todoState);
   const todos = useRecoilValue(todoSelector);
 
-  const [category, setCategory] = useRecoilState(categoryState);
+  const setCategory = useSetRecoilState(categoryState);
   const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategory(event.currentTarget.value as ITodo["category"]);
+    setCategory(event.currentTarget.value as Categories);
   };
   // console.log(todos);
 
@@ -19,9 +19,11 @@ const TodoList = () => {
       <h1>To dos</h1>
       <hr />
       <select onChange={onChange}>
-        <option value="TO_DO">To Do</option>
-        <option value="DOING">Doing</option>
-        <option value="DONE">Done</option>
+        {Object.entries(Categories).map(([key, value]) => (
+          <option value={value} key={key}>
+            {value}
+          </option>
+        ))}
       </select>
       <CreateTodo />
       {todos.map((todo) => (

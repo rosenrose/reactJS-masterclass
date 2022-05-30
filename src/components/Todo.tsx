@@ -10,12 +10,13 @@ const Todo = ({ text, category, id }: ITodo) => {
 
     if (target.matches("button")) {
       const name = target.name as ITodo["category"];
-      console.log(target.name);
+      // console.log(target.name);
 
       setTodos((prev) => {
         const next = [...prev];
         const index = next.findIndex((todo) => todo.id === id)!;
         next[index] = { text, id, category: name };
+        // console.log("next", next);
 
         return next;
       });
@@ -25,8 +26,8 @@ const Todo = ({ text, category, id }: ITodo) => {
   return (
     <li onClick={onClick}>
       <span>{text}</span>
-      {category !== "DOING" && <button name="DOING">Doing</button>}
       {category !== "TO_DO" && <button name="TO_DO">To do</button>}
+      {category !== "DOING" && <button name="DOING">Doing</button>}
       {category !== "DONE" && <button name="DONE">Done</button>}
     </li>
   );

@@ -1,26 +1,22 @@
-import { useForm } from "react-hook-form";
-
-interface IForm {
-  todo: string;
-}
+import { useRecoilValue } from "recoil";
+import CreateTodo from "./CreateTodo";
+import Todo from "./Todo";
+import { todoState } from "../atoms";
 
 const TodoList = () => {
-  const { register, handleSubmit, setValue } = useForm<IForm>();
-  const onSubmit = (data: IForm) => {
-    console.log(data.todo);
-    setValue("todo", "");
-  };
+  const todoList = useRecoilValue(todoState);
+  console.log(todoList);
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input
-          type="text"
-          {...register("todo", { required: "Please write a todo", minLength: 2 })}
-          placeholder="Write a todo"
-        />
-        <button>Add</button>
-      </form>
+      <h1>To dos</h1>
+      <hr />
+      <CreateTodo />
+      <ul>
+        {todoList.map((todo) => (
+          <Todo key={todo.id} {...todo} />
+        ))}
+      </ul>
     </div>
   );
 };

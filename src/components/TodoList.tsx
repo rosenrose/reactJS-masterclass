@@ -4,8 +4,8 @@ import Todo from "./Todo";
 import { todoState } from "../atoms";
 
 const TodoList = () => {
-  const todoList = useRecoilValue(todoState);
-  console.log(todoList);
+  const todos = useRecoilValue(todoState);
+  console.log(todos);
 
   return (
     <div>
@@ -13,7 +13,7 @@ const TodoList = () => {
       <hr />
       <CreateTodo />
       <ul>
-        {todoList.map((todo) => (
+        {todos.map((todo) => (
           <Todo key={todo.id} {...todo} />
         ))}
       </ul>

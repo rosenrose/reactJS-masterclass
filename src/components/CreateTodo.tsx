@@ -8,12 +8,12 @@ export interface IForm {
 
 const CreateTodo = () => {
   const { register, handleSubmit, setValue } = useForm<IForm>();
-  const setTodoList = useSetRecoilState(todoState);
+  const setTodos = useSetRecoilState(todoState);
 
   const onSubmit = (data: IForm) => {
     console.log(data.todo);
     setValue("todo", "");
-    setTodoList((prev) => [...prev, { text: data.todo, category: "TO_DO", id: Date.now() }]);
+    setTodos((prev) => [...prev, { text: data.todo, category: "TO_DO", id: Date.now() }]);
   };
 
   return (

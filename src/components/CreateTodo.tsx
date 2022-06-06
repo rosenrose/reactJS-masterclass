@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { categoryState, todoState } from "../atoms";
+import { categoryState, todoState, TODOS_KEY } from "../atoms";
 
 export interface IForm {
   todo: string;
@@ -14,7 +14,12 @@ const CreateTodo = () => {
   const onSubmit = (data: IForm) => {
     // console.log(data.todo);
     setValue("todo", "");
-    setTodos((prev) => [...prev, { text: data.todo, category, id: Date.now() }]);
+    setTodos((prev) => {
+      const next = [...prev, { text: data.todo, category, id: Date.now() }];
+
+      localStorage.setItem(TODOS_KEY, JSON.stringify(next));
+      return next;
+    });
   };
 
   return (

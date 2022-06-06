@@ -1,4 +1,39 @@
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 30rem;
+  height: 100vh;
+  margin: 0 auto;
+`;
+
+const Boards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  width: 100%;
+`;
+
+const Board = styled.div`
+  background-color: ${(props) => props.theme.boardColor};
+  padding: 1.2rem 0.6rem;
+  padding-top: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Card = styled.div`
+  background-color: ${(props) => props.theme.cardColor};
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+`;
+
+const todos = ["one", "two", "three", "abc", "dfsdf", "asdf", "kksss", "sss"];
 
 function App() {
   const onDragEnd = (a: any) => {
@@ -7,41 +42,30 @@ function App() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="dropId">
-        {(provided) => {
-          // console.log(provided);
-          return (
-            <ul ref={provided.innerRef} {...provided.droppableProps}>
-              <Draggable draggableId="dragId_1" index={0}>
-                {(provided) => {
-                  // console.log(provided);
-                  return (
-                    <li ref={provided.innerRef} {...provided.draggableProps}>
-                      <span {...provided.dragHandleProps}>🔆</span>one
-                    </li>
-                  );
-                }}
-              </Draggable>
-              <Draggable draggableId="dragId_2" index={1}>
-                {(provided) => (
-                  <li ref={provided.innerRef} {...provided.draggableProps}>
-                    two<span {...provided.dragHandleProps}>🔥</span>
-                  </li>
-                )}
-              </Draggable>
-              <Draggable draggableId="dragId_3" index={2}>
-                {(provided) => (
-                  <li ref={provided.innerRef} {...provided.draggableProps}>
-                    <span {...provided.dragHandleProps}>🅰</span>
-                    three
-                    <span {...provided.dragHandleProps}>🅱</span>
-                  </li>
-                )}
-              </Draggable>
-            </ul>
-          );
-        }}
-      </Droppable>
+      <Wrapper>
+        <Boards>
+          <Droppable droppableId="todos">
+            {(provided) => (
+              <Board ref={provided.innerRef} {...provided.droppableProps}>
+                {todos.map((todo, i) => (
+                  <Draggable draggableId={`todo_${i}`} index={i} key={i}>
+                    {(provided) => (
+                      <Card
+                        ref={provided.innerRef}
+                        {...provided.dragHandleProps}
+                        {...provided.draggableProps}
+                      >
+                        {todo}
+                      </Card>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </Board>
+            )}
+          </Droppable>
+        </Boards>
+      </Wrapper>
     </DragDropContext>
   );
 }

@@ -1,9 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { RecoilRoot } from "recoil";
-import { ThemeProvider, createGlobalStyle } from "styled-components";
-import App from "./App";
-import { darkTheme } from "./theme";
+import { createGlobalStyle } from "styled-components";
+import TodoList from "./components/TodoList";
 
 const GlobalStyle = createGlobalStyle`
   @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap");
@@ -71,13 +67,13 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
-  <React.StrictMode>
-    <RecoilRoot>
-      <ThemeProvider theme={darkTheme}>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
-    </RecoilRoot>
-  </React.StrictMode>
-);
+function App() {
+  return (
+    <>
+      <GlobalStyle />
+      <TodoList />
+    </>
+  );
+}
+
+export default App;

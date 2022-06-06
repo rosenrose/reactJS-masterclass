@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import App from "./App";
@@ -71,7 +71,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
+ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <ThemeProvider theme={darkTheme}>
@@ -79,5 +79,6 @@ ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
         <App />
       </ThemeProvider>
     </RecoilRoot>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.querySelector("#root")
 );

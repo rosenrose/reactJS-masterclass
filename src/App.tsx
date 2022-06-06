@@ -1,23 +1,48 @@
-import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { minuteState, hourSelector } from "./atoms";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 function App() {
-  const [minutes, setMinutes] = useRecoilState(minuteState);
-  const onMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMinutes(Number(event.currentTarget.value));
-  };
-
-  const [hours, setHours] = useRecoilState(hourSelector);
-  const onHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHours(Number(event.currentTarget.value));
+  const onDragEnd = (a: any) => {
+    console.log(a);
   };
 
   return (
-    <>
-      <input type="number" value={minutes} onChange={onMinutesChange} placeholder="Minutes" />
-      <input type="number" value={hours} onChange={onHoursChange} placeholder="Hours" />
-    </>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="dropId">
+        {(provided) => {
+          // console.log(provided);
+          return (
+            <ul ref={provided.innerRef} {...provided.droppableProps}>
+              <Draggable draggableId="dragId_1" index={0}>
+                {(provided) => {
+                  // console.log(provided);
+                  return (
+                    <li ref={provided.innerRef} {...provided.draggableProps}>
+                      <span {...provided.dragHandleProps}>🔆</span>one
+                    </li>
+                  );
+                }}
+              </Draggable>
+              <Draggable draggableId="dragId_2" index={1}>
+                {(provided) => (
+                  <li ref={provided.innerRef} {...provided.draggableProps}>
+                    two<span {...provided.dragHandleProps}>🔥</span>
+                  </li>
+                )}
+              </Draggable>
+              <Draggable draggableId="dragId_3" index={2}>
+                {(provided) => (
+                  <li ref={provided.innerRef} {...provided.draggableProps}>
+                    <span {...provided.dragHandleProps}>🅰</span>
+                    three
+                    <span {...provided.dragHandleProps}>🅱</span>
+                  </li>
+                )}
+              </Draggable>
+            </ul>
+          );
+        }}
+      </Droppable>
+    </DragDropContext>
   );
 }
 

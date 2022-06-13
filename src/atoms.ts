@@ -9,12 +9,18 @@ interface ITaskState {
   [key: string]: ITask[];
 }
 
+export const TASKS_KEY = "tasks";
+
+const savedTasks = localStorage.getItem(TASKS_KEY);
+
 export const taskState = atom<ITaskState>({
-  key: "todo",
-  default: {
-    "To Do": [],
-    Doing: [],
-    Done: [],
-    // "Do Later": ["hahaha"],
-  },
+  key: "task",
+  default: savedTasks
+    ? JSON.parse(savedTasks)
+    : {
+        "To Do": [],
+        Doing: [],
+        Done: [],
+        // "Do Later": ["hahaha"],
+      },
 });

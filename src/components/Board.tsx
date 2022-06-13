@@ -2,7 +2,7 @@ import { Droppable } from "react-beautiful-dnd";
 import DraggableCard from "./DraggableCard";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { ITask, taskState } from "../atoms";
+import { ITask, taskState, TASKS_KEY } from "../atoms";
 import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
@@ -45,7 +45,7 @@ const Area = styled.div<IAreaProps>`
 `;
 
 interface IBoardProps {
-  todos: ITask[];
+  tasks: ITask[];
   boardId: string;
 }
 
@@ -53,14 +53,17 @@ interface IForm {
   todo: string;
 }
 
-const Board = ({ todos, boardId }: IBoardProps) => {
+const Board = ({ tasks, boardId }: IBoardProps) => {
   const setTasks = useSetRecoilState(taskState);
 
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onValid = ({ todo }: IForm) => {
     // console.log(todo);
     setTasks((prev) => {
-      return { ...prev, [boardId]: [...prev[boardId], { text: todo, id: Date.now() }] };
+      const next = { ...prev, [boardId]: [...prev[boardId], { text: todo, id: Date.now() }] };
+
+      localStorage.setItem(TASKS_KEY, JSON.stringify(next));
+      return next;
     });
     setValue("todo", "");
   };
@@ -83,8 +86,14 @@ const Board = ({ todos, boardId }: IBoardProps) => {
             isDraggingOver={snapshot.isDraggingOver}
             isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
           >
-            {todos.map((todo, i) => (
-              <DraggableCard key={todo.id} index={i} todo={todo.text} id={todo.id} />
+            {tasks.map((task, i) => (
+              <DraggableCard
+                key={task.id}
+                index={i}
+                task={task.text}
+                id={task.id}
+                boardId={boardId}
+              />
             ))}
             {provided.placeholder}
           </Area>

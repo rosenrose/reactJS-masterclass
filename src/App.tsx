@@ -1,7 +1,7 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { itemState } from "./atoms";
+import { taskState } from "./atoms";
 import Board from "./components/Board";
 
 const Wrapper = styled.div`
@@ -21,7 +21,7 @@ const Boards = styled.div`
 `;
 
 function App() {
-  const [items, setItems] = useRecoilState(itemState);
+  const [tasks, setTasks] = useRecoilState(taskState);
 
   const onDragEnd = (result: DropResult) => {
     // console.log(result);
@@ -29,7 +29,7 @@ function App() {
 
     if (!destination) return;
 
-    setItems((prev) => {
+    setTasks((prev) => {
       const next = { ...prev };
       const { index: srcIdx, droppableId: srcDropId } = source;
       const { index: dstIdx, droppableId: dstDropId } = destination;
@@ -51,7 +51,7 @@ function App() {
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
         <Boards>
-          {Object.entries(items).map(([boardId, todos]) => (
+          {Object.entries(tasks).map(([boardId, todos]) => (
             <Board todos={todos} key={boardId} boardId={boardId} />
           ))}
         </Boards>

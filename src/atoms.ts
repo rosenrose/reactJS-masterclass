@@ -1,15 +1,20 @@
 import { atom } from "recoil";
 
-interface IItemState {
-  [key: string]: string[];
+export interface ITask {
+  text: string;
+  id: number;
 }
 
-export const itemState = atom<IItemState>({
+interface ITaskState {
+  [key: string]: ITask[];
+}
+
+export const taskState = atom<ITaskState>({
   key: "todo",
   default: {
-    "To Do": ["car", "sun", "bike"],
-    Doing: ["wash", "dish", "clean", "clear"],
-    Done: ["coding"],
+    "To Do": [],
+    Doing: [],
+    Done: [],
     // "Do Later": ["hahaha"],
   },
 });

@@ -9,13 +9,13 @@ const Card = styled.div`
 `;
 
 interface IDraggableCardProps {
-  todo: number;
+  todo: string;
   index: number;
   boardId: string;
 }
 
 const DraggableCard = ({ todo, index, boardId }: IDraggableCardProps) => {
-  console.log(todo, "rendered");
+  // console.log(todo, "rendered");
 
   return (
     <Draggable draggableId={`${boardId}_${index}`} index={index}>

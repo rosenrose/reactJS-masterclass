@@ -7,29 +7,46 @@ const Wrapper = styled.div`
   padding: 1.2rem 0.6rem;
   padding-top: 2rem;
   border-radius: 0.5rem;
+  width: 20rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+`;
+
+const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  background-color: red;
+  flex-grow: 1;
 `;
 
 interface IBoardProps {
-  todos: number[];
+  todos: string[];
   boardId: string;
 }
 
 const Board = ({ todos, boardId }: IBoardProps) => {
   return (
-    <Droppable droppableId={boardId}>
-      {(provided) => (
-        <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
-          <h2>{boardId}</h2>
-          {todos.map((todo, i) => (
-            <DraggableCard key={i} todo={todo} index={i} boardId={boardId} />
-          ))}
-          {provided.placeholder}
-        </Wrapper>
-      )}
-    </Droppable>
+    <Wrapper>
+      <Title>{boardId}</Title>
+      <Droppable droppableId={boardId}>
+        {(provided) => (
+          <CardContainer ref={provided.innerRef} {...provided.droppableProps}>
+            {todos.map((todo, i) => (
+              <DraggableCard key={i} todo={todo} index={i} boardId={boardId} />
+            ))}
+            {provided.placeholder}
+          </CardContainer>
+        )}
+      </Droppable>
+    </Wrapper>
   );
 };
 

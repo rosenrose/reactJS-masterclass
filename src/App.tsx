@@ -9,15 +9,14 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 50rem;
+  max-width: 60rem;
   height: 100vh;
   margin: 0 auto;
 `;
 
 const Boards = styled.div`
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 1rem;
 `;
 
@@ -30,13 +29,22 @@ function App() {
 
     if (!destination) return;
 
-    // setItems((prev) => {
-    //   const next = { ...prev };
-    //   next.todo = [...next.todo];
-    //   next.todo.splice(destination.index, 0, next.todo.splice(source.index, 1)[0]);
+    setItems((prev) => {
+      const next = { ...prev };
+      const { index: srcIdx, droppableId: srcDropId } = source;
+      const { index: dstIdx, droppableId: dstDropId } = destination;
 
-    //   return next;
-    // });
+      next[srcDropId] = [...next[srcDropId]];
+
+      if (srcDropId === dstDropId) {
+        next[srcDropId].splice(dstIdx, 0, next[srcDropId].splice(srcIdx, 1)[0]);
+      } else {
+        next[dstDropId] = [...next[dstDropId]];
+        next[dstDropId].splice(dstIdx, 0, next[srcDropId].splice(srcIdx, 1)[0]);
+      }
+
+      return next;
+    });
   };
 
   return (

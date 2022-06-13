@@ -19,7 +19,7 @@ const DraggableCard = ({ todo, index, boardId }: IDraggableCardProps) => {
 
   return (
     <Draggable draggableId={`${boardId}_${index}`} index={index}>
-      {(provided) => (
+      {(provided, snapshot) => (
         <Card ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
           {todo}
         </Card>

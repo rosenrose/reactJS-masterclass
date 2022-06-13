@@ -10,6 +10,6 @@ export const itemState = atom<IItemState>({
     "To Do": ["car", "sun", "bike"],
     Doing: ["wash", "dish", "clean", "clear"],
     Done: ["coding"],
-    "Do Later": ["hahaha"],
+    // "Do Later": ["hahaha"],
   },
 });

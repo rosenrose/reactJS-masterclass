@@ -1,6 +1,10 @@
 import { atom } from "recoil";
 
-export const todoState = atom({
+export const itemState = atom({
   key: "todo",
-  default: [...Array(8)].map((_, i) => i),
+  default: {
+    todo: [1, 4, 6],
+    doing: [5, 0, 2],
+    done: [3],
+  },
 });

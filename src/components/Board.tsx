@@ -4,8 +4,7 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.boardColor};
-  padding: 1.2rem 0.6rem;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   border-radius: 0.5rem;
   width: 20rem;
   display: flex;
@@ -15,7 +14,7 @@ const Wrapper = styled.div`
 const Title = styled.h2`
   text-align: center;
   font-weight: 600;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   font-size: 1.2rem;
 `;
 
@@ -32,6 +31,7 @@ const Area = styled.div<IAreaProps>`
     props.isDraggingOver ? "#8FCFEB" : props.isDraggingFromThis ? "#38748C" : "transparent"};
   flex-grow: 1;
   transition: background-color 0.3s ease-in-out;
+  padding: 1.2rem;
 `;
 
 interface IBoardProps {

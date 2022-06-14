@@ -1,7 +1,8 @@
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { saveLocal, taskState } from "./atoms";
+import { boardState, saveBoard, saveTask, taskState } from "./atoms";
 import Board from "./components/Board";
 
 const Wrapper = styled.div`
@@ -11,7 +12,6 @@ const Wrapper = styled.div`
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  max-width: 60rem;
   height: 100vh;
   margin: 0 auto;
 `;
@@ -19,6 +19,7 @@ const Wrapper = styled.div`
 const Boards = styled.div`
   width: 100%;
   display: flex;
+  justify-content: center;
   gap: 1rem;
 `;
 
@@ -28,10 +29,26 @@ const Trash = styled.div<{ isDraggingOver: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 30%;
   font-size: 3rem;
   border-radius: 0.5rem;
   transition: background-color 0.3s ease-in-out;
+`;
+
+const Form = styled.form`
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+
+  input {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  p {
+    text-align: center;
+  }
 `;
 
 function App() {
@@ -39,8 +56,8 @@ function App() {
   // console.log("tasks", tasks);
 
   const onDragEnd = (result: DropResult) => {
-    // console.log(result);
-    const { source, destination } = result;
+    console.log(result);
+    const { source, destination, draggableId } = result;
 
     if (!destination) return;
 
@@ -60,33 +77,70 @@ function App() {
           next[dstDropId].splice(dstIdx, 0, next[srcDropId].splice(srcIdx, 1)[0]);
         }
 
-        saveLocal(next);
+        saveTask(next);
         return next;
       });
     } else if (dstDropId === "trash") {
+      setBoards((prev) => {
+        const next = prev.filter((board) => board !== draggableId);
+        saveBoard(next);
+        return next;
+      });
       setTasks((prev) => {
-        const next = {
-          ...prev,
-          [srcDropId]: [...prev[srcDropId]].filter(
-            (task) => task.id !== parseInt(result.draggableId)
-          ),
-        };
-
-        saveLocal(next);
+        const next = { ...prev };
+        delete next[draggableId];
+        saveTask(next);
         return next;
       });
     }
   };
 
+  interface IForm {
+    boardName: string;
+  }
+
+  const [boards, setBoards] = useRecoilState(boardState);
+
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<IForm>();
+
+  const onValid = ({ boardName }: IForm) => {
+    if (boards.includes(boardName)) {
+      return setError("boardName", { message: "Existing Board Name" }, { shouldFocus: true });
+    }
+
+    setBoards((prev) => {
+      const next = [...prev, boardName];
+      saveBoard(next);
+      return next;
+    });
+    setTasks((prev) => {
+      const next = { ...prev, [boardName]: [] };
+      saveTask(next);
+      return next;
+    });
+
+    setValue("boardName", "");
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Wrapper>
-        <Boards>
-          {Object.entries(tasks).map(([boardId, task]) => (
-            <Board tasks={task} key={boardId} boardId={boardId} />
-          ))}
-        </Boards>
-        <Droppable droppableId="trash">
+    <Wrapper>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="boards" direction="horizontal" type="board">
+          {(provided) => (
+            <Boards ref={provided.innerRef} {...provided.droppableProps}>
+              {boards.map((boardId, i) => (
+                <Board tasks={tasks[boardId] || []} key={i} boardId={boardId} index={i} />
+              ))}
+            </Boards>
+          )}
+        </Droppable>
+        <Droppable droppableId="trash" type="board">
           {(provided, snapshot) => (
             <Trash
               ref={provided.innerRef}
@@ -97,8 +151,16 @@ function App() {
             </Trash>
           )}
         </Droppable>
-      </Wrapper>
-    </DragDropContext>
+        <Form onSubmit={handleSubmit(onValid)}>
+          <input
+            type="text"
+            {...register("boardName", { required: true })}
+            placeholder="Add a new board"
+          />
+          {errors.boardName && <p>🚫{errors.boardName?.message}</p>}
+        </Form>
+      </DragDropContext>
+    </Wrapper>
   );
 }
 

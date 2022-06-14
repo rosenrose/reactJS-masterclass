@@ -2,7 +2,7 @@ import { Droppable } from "react-beautiful-dnd";
 import DraggableCard from "./DraggableCard";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { ITask, taskState, TASKS_KEY } from "../atoms";
+import { ITask, saveLocal, taskState } from "../atoms";
 import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
@@ -23,8 +23,13 @@ const Title = styled.h2`
 
 const Form = styled.form`
   width: 100%;
+  display: flex;
+  justify-content: center;
   input {
     width: 100%;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
   }
 `;
 
@@ -62,7 +67,7 @@ const Board = ({ tasks, boardId }: IBoardProps) => {
     setTasks((prev) => {
       const next = { ...prev, [boardId]: [...prev[boardId], { text: todo, id: Date.now() }] };
 
-      localStorage.setItem(TASKS_KEY, JSON.stringify(next));
+      saveLocal(next);
       return next;
     });
     setValue("todo", "");

@@ -9,8 +9,7 @@ interface ITaskState {
   [key: string]: ITask[];
 }
 
-export const TASKS_KEY = "tasks";
-
+const TASKS_KEY = "tasks";
 const savedTasks = localStorage.getItem(TASKS_KEY);
 
 export const taskState = atom<ITaskState>({
@@ -24,3 +23,7 @@ export const taskState = atom<ITaskState>({
         // "Do Later": ["hahaha"],
       },
 });
+
+export const saveLocal = (task: ITaskState) => {
+  localStorage.setItem(TASKS_KEY, JSON.stringify(task));
+};

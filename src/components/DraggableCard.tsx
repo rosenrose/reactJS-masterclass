@@ -1,7 +1,7 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
-import { taskState, TASKS_KEY } from "../atoms";
+import { saveLocal, taskState } from "../atoms";
 import { useSetRecoilState } from "recoil";
 
 const Card = styled.div<{ isDragging: boolean }>`
@@ -28,7 +28,7 @@ const DraggableCard = ({ task, id, index, boardId }: IDraggableCardProps) => {
     setTasks((prev) => {
       const next = { ...prev, [boardId]: [...prev[boardId]].filter((task) => task.id !== id) };
 
-      localStorage.setItem(TASKS_KEY, JSON.stringify(next));
+      saveLocal(next);
       return next;
     });
   };

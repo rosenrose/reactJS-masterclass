@@ -58,14 +58,14 @@ function App() {
 
   const onDragEnd = (result: DropResult) => {
     console.log(result);
-    const { source, destination, draggableId } = result;
+    const { source, destination, draggableId, type } = result;
 
     if (!destination) return;
 
     const { index: srcIdx, droppableId: srcDropId } = source;
     const { index: dstIdx, droppableId: dstDropId } = destination;
 
-    if (dstDropId in tasks) {
+    if (type === "task") {
       setTasks((prev) => {
         const next = { ...prev };
 
@@ -81,26 +81,28 @@ function App() {
         saveTask(next);
         return next;
       });
-    } else if (dstDropId === "boards") {
-      setBoards((prev) => {
-        const next = [...prev];
-        next.splice(dstIdx, 0, next.splice(srcIdx, 1)[0]);
+    } else if (type === "board") {
+      if (dstDropId === "boards") {
+        setBoards((prev) => {
+          const next = [...prev];
+          next.splice(dstIdx, 0, next.splice(srcIdx, 1)[0]);
 
-        saveBoard(next);
-        return next;
-      });
-    } else if (dstDropId === "trash") {
-      setBoards((prev) => {
-        const next = prev.filter((board) => board !== draggableId);
-        saveBoard(next);
-        return next;
-      });
-      setTasks((prev) => {
-        const next = { ...prev };
-        delete next[draggableId];
-        saveTask(next);
-        return next;
-      });
+          saveBoard(next);
+          return next;
+        });
+      } else if (dstDropId === "trash") {
+        setBoards((prev) => {
+          const next = prev.filter((board) => board !== draggableId);
+          saveBoard(next);
+          return next;
+        });
+        setTasks((prev) => {
+          const next = { ...prev };
+          delete next[draggableId];
+          saveTask(next);
+          return next;
+        });
+      }
     }
   };
 

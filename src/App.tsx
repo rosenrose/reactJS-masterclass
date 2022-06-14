@@ -53,6 +53,7 @@ const Form = styled.form`
 
 function App() {
   const [tasks, setTasks] = useRecoilState(taskState);
+  const [boards, setBoards] = useRecoilState(boardState);
   // console.log("tasks", tasks);
 
   const onDragEnd = (result: DropResult) => {
@@ -80,6 +81,14 @@ function App() {
         saveTask(next);
         return next;
       });
+    } else if (dstDropId === "boards") {
+      setBoards((prev) => {
+        const next = [...prev];
+        next.splice(dstIdx, 0, next.splice(srcIdx, 1)[0]);
+
+        saveBoard(next);
+        return next;
+      });
     } else if (dstDropId === "trash") {
       setBoards((prev) => {
         const next = prev.filter((board) => board !== draggableId);
@@ -98,8 +107,6 @@ function App() {
   interface IForm {
     boardName: string;
   }
-
-  const [boards, setBoards] = useRecoilState(boardState);
 
   const {
     register,
@@ -137,6 +144,7 @@ function App() {
               {boards.map((boardId, i) => (
                 <Board tasks={tasks[boardId] || []} key={i} boardId={boardId} index={i} />
               ))}
+              {provided.placeholder}
             </Boards>
           )}
         </Droppable>

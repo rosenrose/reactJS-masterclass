@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, useViewportScroll } from "framer-motion";
 import { useEffect } from "react";
 
 const Wrapper = styled(motion.div)`
   width: 100vw;
-  height: 100vh;
+  height: 200vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -27,7 +27,6 @@ const boxVar = {
 
 const App = () => {
   const x = useMotionValue(0);
-  const scale = useTransform(x, [-800, 800], [2, 0.1]);
   const rotateZ = useTransform(x, [-800, 800], [360, -360]);
   const gradient = useTransform(
     x,
@@ -39,10 +38,18 @@ const App = () => {
     ]
   );
 
+  const { scrollY, scrollYProgress } = useViewportScroll();
+  const scale = useTransform(scrollYProgress, [0, 1], [0.5, 2]);
+
   useEffect(() => {
-    // x.onChange((latest) => {console.log(latest);});
-    scale.onChange((latest) => {
-      console.log(latest);
+    // x.onChange((latest) => {
+    //   console.log(latest);
+    // });
+    // scale.onChange((latest) => {
+    //   console.log(latest);
+    // });
+    scrollY.onChange((latest) => {
+      console.log(scrollY.get(), scrollYProgress.get());
     });
   }, []);
 

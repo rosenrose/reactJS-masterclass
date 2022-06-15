@@ -1,25 +1,14 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { useRef } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect } from "react";
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #e09, #d0e);
-`;
-
-const Border = styled.div`
-  width: 40rem;
-  height: 40rem;
-  border-radius: 1rem;
-  background-color: rgba(205, 205, 205, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+  background: linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238));
 `;
 
 const Box = styled(motion.div)`
@@ -37,21 +26,30 @@ const boxVar = {
 };
 
 const App = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const scale = useTransform(x, [-800, 800], [2, 0.1]);
+  const rotateZ = useTransform(x, [-800, 800], [360, -360]);
+  const gradient = useTransform(
+    x,
+    [-800, 0, 800],
+    [
+      "linear-gradient(0deg, rgb(0, 210, 238), rgb(0, 83, 238))",
+      "linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238))",
+      "linear-gradient(270deg, rgb(0, 238, 155), rgb(238, 178, 0))",
+    ]
+  );
+
+  useEffect(() => {
+    // x.onChange((latest) => {console.log(latest);});
+    scale.onChange((latest) => {
+      console.log(latest);
+    });
+  }, []);
 
   return (
-    <Wrapper>
-      <Border ref={ref}>
-        <Box
-          variants={boxVar}
-          whileHover="hover"
-          whileTap="click"
-          drag
-          whileDrag="drag"
-          dragConstraints={ref}
-          dragSnapToOrigin
-        ></Box>
-      </Border>
+    <Wrapper style={{ background: gradient }}>
+      <button onClick={() => x.set(0)}>click</button>
+      <Box drag="x" style={{ x, scale, rotateZ }}></Box>
     </Wrapper>
   );
 };

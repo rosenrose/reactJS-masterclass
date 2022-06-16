@@ -64,9 +64,7 @@ const App = () => {
     <Wrapper>
       <button onClick={() => setIsVisible((prev) => !prev)}>click</button>
       <AnimatePresence>
-        {isVisible && (
-          <Box variants={boxVar} {...boxVar} style={{ position: "absolute", top: "5rem" }} />
-        )}
+        {isVisible && <Box {...boxVar} style={{ position: "absolute", top: "5rem" }} />}
       </AnimatePresence>
 
       <button onClick={scrollNext}>next</button>
@@ -74,7 +72,7 @@ const App = () => {
       <AnimatePresence custom={direction} exitBeforeEnter>
         {/* {numbers.map((i) =>
             i === visibleIdx + 1 ? (
-              <Box key={i} variants={boxVar2} {...boxVar2} style={{ position: "absolute" }}>
+              <Box key={i} {...boxVar2} style={{ position: "absolute" }}>
                 {i}
               </Box>
             ) : null
@@ -84,8 +82,8 @@ const App = () => {
           */}
         <Box
           variants={boxVar2}
-          {...boxVar2}
           initial="initial"
+          animate="animate"
           exit="exit"
           custom={direction}
           style={{ position: "absolute", bottom: "5rem" }}

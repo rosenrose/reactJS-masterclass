@@ -8,15 +8,15 @@ declare module "styled-components" {
     accentBgColor?: string;
     boardColor?: string;
     cardColor?: string;
-    red?: string;
-    black?: {
-      veryDark?: string;
-      darker?: string;
-      lighter?: string;
+    red: string;
+    black: {
+      veryDark: string;
+      darker: string;
+      lighter: string;
     };
-    white?: {
-      lighter?: string;
-      darker?: string;
+    white: {
+      lighter: string;
+      darker: string;
     };
   }
 }

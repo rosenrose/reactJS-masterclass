@@ -27,16 +27,16 @@ function getTypes(obj) {
   }
 }
 
-fetch(`https://api.coinpaprika.com/v1/coins/btc-bitcoin`)
-  .then((response) => response.json())
-  .then((json) => {
-    console.log(json, getTypes(json), objectToEntries(json));
-  });
-fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`)
-  .then((response) => response.json())
-  .then((json) => {
-    console.log(json, getTypes(json), objectToEntries(json));
-  });
+[
+  `https://api.coinpaprika.com/v1/coins/btc-bitcoin`,
+  `https://api.coinpaprika.com/v1/tickers/btc-bitcoin`,
+].forEach((url) => {
+  fetch(url)
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json, getTypes(json), objectToEntries(json));
+    });
+});
 
 function objectToEntries(obj) {
   if (typeof obj === "object") {

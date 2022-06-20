@@ -32,7 +32,9 @@ export interface IGetMoviesResult {
   pageInfo: { totalResults: number; resultsPerPage: number };
 }
 
+export const MAX_RESULTS = 20;
+
 export const getMovies = () =>
   fetch(
-    `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=UUyWiQldYO_-yeLJC0j5oq2g&key=${API_KEY}&part=snippet,contentDetails&maxResults=20`
+    `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=UUyWiQldYO_-yeLJC0j5oq2g&key=${API_KEY}&part=snippet,contentDetails&maxResults=${MAX_RESULTS}`
   ).then((r) => r.json());

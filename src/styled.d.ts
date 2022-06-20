@@ -18,5 +18,6 @@ declare module "styled-components" {
       lighter: string;
       darker: string;
     };
+    headerHeight: string;
   }
 }

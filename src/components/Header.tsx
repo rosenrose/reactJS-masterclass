@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const Nav = styled(motion.nav)`
   width: 100%;
-  height: 5rem;
+  height: ${(props) => props.theme.headerHeight};
   display: flex;
   justify-content: space-between;
   align-items: center;

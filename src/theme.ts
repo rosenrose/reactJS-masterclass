@@ -29,4 +29,5 @@ export const theme: DefaultTheme = {
     lighter: "#cdcdcd",
     darker: "#E5E5E5",
   },
+  headerHeight: "5rem",
 };

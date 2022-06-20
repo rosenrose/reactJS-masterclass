@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
 
 const Wrapper = styled(motion.div)`
   width: 100vw;
@@ -13,45 +13,55 @@ const Wrapper = styled(motion.div)`
   position: relative;
 `;
 
-const Box = styled(motion.div)`
-  width: 15rem;
-  height: 15rem;
-  border-radius: 1rem;
-  background-color: #cdcdcd;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7), 0 10px 20px rgba(0, 0, 0, 0.6);
-  display: flex;
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  div:first-child,
+  div:last-child {
+    grid-column: span 2;
+  }
+  gap: 1rem;
+  width: 50%;
 `;
 
-const Box2 = styled(Box)`
+const Box = styled(motion.div)`
+  height: 15rem;
+  border-radius: 2rem;
+  background-color: #cdcdcd;
+`;
+
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const Circle = styled(motion.div)`
-  width: 5rem;
-  height: 5rem;
-  border-radius: 50%;
-  background-color: #00a5ff;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.7), 0 5px 10px rgba(0, 0, 0, 0.6);
-`;
+const OverlayVar = {
+  initial: { backgroundColor: "rgba(0, 0, 0, 0)" },
+  animate: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+  exit: { backgroundColor: "rgba(0, 0, 0, 0)" },
+};
 
 const App = () => {
-  const [isClicked, setIsClicked] = useState(false);
+  const [id, setId] = useState<null | string>(null);
 
   return (
-    <Wrapper onClick={() => setIsClicked((prev) => !prev)}>
-      <Box
-        style={{
-          justifyContent: isClicked ? "center" : "flex-start",
-          alignItems: isClicked ? "center" : "flex-start",
-        }}
-      >
-        <Circle layout />
-      </Box>
-      <Box2>{isClicked && <Circle layoutId="circle" style={{ borderRadius: "50%" }} />}</Box2>
-      <Box2>
-        {!isClicked && <Circle layoutId="circle" style={{ borderRadius: 0, scale: 2 }} />}
-      </Box2>
+    <Wrapper>
+      <Grid>
+        {[...Array(4)].map((_, i) => (
+          <Box key={i} layoutId={i.toString()} onClick={() => setId(i.toString())} />
+        ))}
+      </Grid>
+      <AnimatePresence>
+        {id && (
+          <Overlay {...OverlayVar} onClick={() => setId(null)}>
+            <Box style={{ width: "30rem" }} layoutId={id!} />
+          </Overlay>
+        )}
+      </AnimatePresence>
     </Wrapper>
   );
 };

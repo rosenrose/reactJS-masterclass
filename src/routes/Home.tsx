@@ -40,6 +40,7 @@ const Title = styled.h2`
 const Overview = styled.p`
   width: 50%;
   font-size: 1.5rem;
+  text-overflow: ellipsis;
 `;
 
 const Slider = styled.div`
@@ -112,7 +113,7 @@ const Home = () => {
             }}
           >
             <Title>{data?.items[0].snippet.title}</Title>
-            <Overview>{data?.items[0].snippet.description.slice(0, 140) + "..."}</Overview>
+            <Overview>{data?.items[0].snippet.description}</Overview>
           </Banner>
           <Slider>
             <AnimatePresence onExitComplete={toggleSliding} initial={false}>

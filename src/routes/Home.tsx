@@ -20,7 +20,7 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgImage: string | undefined }>`
+const Banner = styled.div<{ bgimage: string | undefined }>`
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@ const Banner = styled.div<{ bgImage: string | undefined }>`
   gap: 1.2rem;
   padding: 4rem;
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
-    url(${(props) => props.bgImage || ""});
+    url(${(props) => props.bgimage || ""});
   background-size: cover;
   background-position: center center;
 `;
@@ -56,9 +56,9 @@ const Row = styled(motion.div)`
   position: absolute;
 `;
 
-const Box = styled(motion.div)<{ bgImage: string | undefined }>`
+const Box = styled(motion.div)<{ bgimage: string | undefined }>`
   height: 10rem;
-  background-image: url(${(props) => props.bgImage || ""});
+  background-image: url(${(props) => props.bgimage || ""});
   background-size: cover;
   background-position: center center;
 `;
@@ -100,7 +100,7 @@ const Home = () => {
       ) : (
         <>
           <Banner
-            bgImage={thumbnail}
+            bgimage={thumbnail}
             onClick={() => {
               if (isSliding) return;
               toggleSliding();
@@ -124,7 +124,7 @@ const Home = () => {
                   .map((movie) => (
                     <Box
                       key={movie.contentDetails.videoId}
-                      bgImage={thumbnails[movie.contentDetails.videoId]}
+                      bgimage={thumbnails[movie.contentDetails.videoId]}
                     >
                       {movie.snippet.title}
                     </Box>

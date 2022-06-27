@@ -56,18 +56,48 @@ const Row = styled(motion.div)`
   position: absolute;
 `;
 
-const Box = styled(motion.div)<{ bgimage: string | undefined }>`
-  height: 10rem;
-  background-image: url(${(props) => props.bgimage || ""});
-  background-size: cover;
-  background-position: center center;
-`;
-
 const rowVariants = {
   initial: { x: window.innerWidth },
   animate: { x: 0 },
   exit: { x: -1 * window.innerWidth },
   transition: { type: "tween", duration: 1 },
+};
+
+const Box = styled(motion.div)<{ bgimage: string | undefined }>`
+  height: 10rem;
+  background-image: url(${(props) => props.bgimage || ""});
+  background-size: cover;
+  background-position: center center;
+
+  &:last-child {
+    transform-origin: right;
+  }
+  &:first-child {
+    transform-origin: left;
+  }
+`;
+
+const boxVariants = {
+  initial: { scale: 1 },
+  whileHover: { scale: 1.3, y: -20, transition: { delay: 0.2, type: "tween" } },
+};
+
+const Info = styled(motion.div)`
+  padding: 1rem;
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
+  h4 {
+    text-align: center;
+    font-size: 1.1rem;
+  }
+`;
+
+const infoVariants = {
+  whileHover: { opacity: 1, transition: boxVariants.whileHover.transition },
 };
 
 const Home = () => {
@@ -125,8 +155,14 @@ const Home = () => {
                     <Box
                       key={movie.contentDetails.videoId}
                       bgimage={thumbnails[movie.contentDetails.videoId]}
+                      variants={boxVariants}
+                      initial="initial"
+                      whileHover="whileHover"
+                      transition={{ type: "tween" }}
                     >
-                      {movie.snippet.title}
+                      <Info variants={infoVariants}>
+                        <h4>{movie.snippet.title}</h4>
+                      </Info>
                     </Box>
                   ))}
               </Row>

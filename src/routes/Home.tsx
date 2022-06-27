@@ -1,6 +1,7 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useQueries, useQuery } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult, MAX_RESULTS } from "../api";
 import { getThumbnail } from "../utils";
@@ -68,6 +69,7 @@ const Box = styled(motion.div)<{ bgimage: string | undefined }>`
   background-image: url(${(props) => props.bgimage || ""});
   background-size: cover;
   background-position: center center;
+  cursor: pointer;
 
   &:last-child {
     transform-origin: right;
@@ -100,6 +102,47 @@ const infoVariants = {
   whileHover: { opacity: 1, transition: boxVariants.whileHover.transition },
 };
 
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+const BigMovie = styled(motion.div)`
+  position: absolute;
+  width: 40vw;
+  height: 70vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: ${(props) => props.theme.black.lighter};
+  border-radius: 1rem;
+  overflow: hidden;
+`;
+
+const BigCover = styled.div`
+  width: 100%;
+  height: 50%;
+  background-size: cover;
+  background-position: center center;
+`;
+
+const BigTitle = styled.h3`
+  color: ${(props) => props.theme.white.lighter};
+  font-size: 2.2rem;
+  margin-top: -4rem;
+  padding: 1rem;
+`;
+
+const BigOverview = styled.p`
+  color: ${(props) => props.theme.white.lighter};
+  font-size: 0.8rem;
+  padding: 1rem;
+`;
+
 const Home = () => {
   const { isLoading, data } = useQuery<IGetMoviesResult>("getMovies", getMovies);
   const { data: thumbnail } = useQuery<string>("getThumbnail", () =>
@@ -122,6 +165,20 @@ const Home = () => {
   const thumbnails: { [key: string]: string } = Object.fromEntries(
     queries.map((query) => query.data || [])
   );
+
+  const navigate = useNavigate();
+  const onBoxClick = (id: string) => {
+    navigate(`/movies/${id}`);
+  };
+  const bigMovieMatch = useMatch("/movies/:id");
+  // console.log(bigMovieMatch);
+
+  const { scrollY } = useViewportScroll();
+
+  const clickedMovie =
+    bigMovieMatch?.params.id &&
+    data?.items.find((movie) => movie.contentDetails.videoId === bigMovieMatch.params.id);
+  // console.log(clickedMovie);
 
   return (
     <Wrapper>
@@ -159,6 +216,8 @@ const Home = () => {
                       initial="initial"
                       whileHover="whileHover"
                       transition={{ type: "tween" }}
+                      onClick={() => onBoxClick(movie.contentDetails.videoId)}
+                      layoutId={movie.contentDetails.videoId}
                     >
                       <Info variants={infoVariants}>
                         <h4>{movie.snippet.title}</h4>
@@ -168,6 +227,32 @@ const Home = () => {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {bigMovieMatch && (
+              <>
+                <Overlay
+                  onClick={() => navigate("/")}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                />
+                <BigMovie layoutId={bigMovieMatch.params.id} style={{ top: scrollY.get() + 100 }}>
+                  {clickedMovie && (
+                    <>
+                      <BigCover
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black, transparent), url(${
+                            thumbnails[clickedMovie.contentDetails.videoId]
+                          })`,
+                        }}
+                      />
+                      <BigTitle>{clickedMovie.snippet.title}</BigTitle>
+                      <BigOverview>{clickedMovie.snippet.description}</BigOverview>
+                    </>
+                  )}
+                </BigMovie>
+              </>
+            )}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>

@@ -145,7 +145,7 @@ const BigOverview = styled.p`
 
 const Home = () => {
   const { isLoading, data } = useQuery<IGetMoviesResult>("getMovies", getMovies);
-  const { isLoading: isThumbnailLoading, data: thumbnail } = useQuery<string>("getThumbnail", () =>
+  const { data: thumbnail } = useQuery<string>("getThumbnail", () =>
     getThumbnail(data?.items[0].contentDetails.videoId)
   );
 
@@ -182,7 +182,7 @@ const Home = () => {
 
   return (
     <Wrapper>
-      {isLoading || isThumbnailLoading ? (
+      {isLoading || !thumbnail ? (
         <Loader>Loading...</Loader>
       ) : (
         <>

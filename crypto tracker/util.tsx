@@ -16,7 +16,8 @@ const Li = styled.li`
 `;
 
 export function ObjectToDetails({ obj }: { obj: any }) {
-  if (typeof obj === "object") {
+  //typeof null === "object"
+  if (typeof obj === "object" && obj !== null) {
     if (Array.isArray(obj)) {
       return (
         <>

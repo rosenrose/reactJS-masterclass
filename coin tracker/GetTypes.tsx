@@ -1,5 +1,5 @@
 import { useQueries } from "react-query";
-import { ObjectToDetails } from "./routes/Price";
+import { ObjectToDetails } from "./util";
 
 const GetTypes = () => {
   const result = useQueries([

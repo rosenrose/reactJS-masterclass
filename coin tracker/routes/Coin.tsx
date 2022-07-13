@@ -5,11 +5,12 @@ import { Helmet } from "react-helmet";
 import { fetchCoinInfo, fetchCoinPrice } from "../api";
 import Price from "./Price";
 import Chart from "./Chart";
+import Info from "./Info";
 
 const Container = styled.div`
   padding: 0 1.2rem;
   margin: 0 auto;
-  max-width: 30rem;
+  max-width: 40rem;
 `;
 
 const Header = styled.header`
@@ -55,7 +56,7 @@ const Description = styled.p`
 
 const Tabs = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   margin: 1.5rem 0;
   gap: 1rem;
 `;
@@ -92,7 +93,7 @@ interface Location {
   };
 }
 
-interface IInfo {
+export interface IInfo {
   id: string;
   name: string;
   symbol: string;
@@ -182,7 +183,8 @@ const Coin = () => {
 
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
-  // console.log(priceMatch);
+  const infoMatch = useMatch("/:coinId/info");
+  // console.log(priceMatch, chartMatch);
 
   return (
     <Container>
@@ -231,10 +233,14 @@ const Coin = () => {
             <Tab isActive={priceMatch !== null}>
               <Link to="price">Price</Link>
             </Tab>
+            <Tab isActive={infoMatch !== null}>
+              <Link to="info">Info</Link>
+            </Tab>
           </Tabs>
           <Routes>
             <Route path="chart" element={<Chart coinId={coinId!} />} />
             <Route path="price" element={<Price coinId={coinId!} price={price!} />} />
+            <Route path="info" element={<Info coinId={coinId!} info={info!} />} />
           </Routes>
         </>
       )}

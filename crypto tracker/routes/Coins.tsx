@@ -84,7 +84,7 @@ const Coins = () => {
             <Coin key={coin.id}>
               <Link to={`/${coin.id}`} state={{ name: coin.name }}>
                 <CoinIcon
-                  src={`https://raw.githubusercontent.com/TokenTax/cryptoicon-api/master/public/icons/128/color/${coin.symbol.toLowerCase()}.png`}
+                  src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
                   alt={coin.symbol}
                 />
                 {coin.name} &rarr;

@@ -1,21 +1,23 @@
 import { atom, selector } from "recoil";
 
-export enum Categories {
-  TO_DO = "To Do",
-  DOING = "Doing",
-  DONE = "Done",
-}
-// console.log(Categories);
-
 export interface ITodo {
   text: string;
-  category: Categories;
+  category: string;
   id: number;
 }
 
-export const categoryState = atom<Categories>({
+export const defaultCategories = ["To Do", "Doing", "Done"];
+export const CATEGORIES_KEY = "categories";
+const savedCategories = localStorage.getItem(CATEGORIES_KEY);
+
+export const categoriesState = atom<string[]>({
+  key: "categories",
+  default: savedCategories ? (JSON.parse(savedCategories) as string[]) : defaultCategories,
+});
+
+export const categoryState = atom<string>({
   key: "category",
-  default: Categories.TO_DO,
+  default: "To Do",
 });
 
 export const TODOS_KEY = "todos";

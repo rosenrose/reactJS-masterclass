@@ -17,7 +17,7 @@ export const categoriesState = atom<string[]>({
 
 export const categoryState = atom<string>({
   key: "category",
-  default: "To Do",
+  default: defaultCategories[0],
 });
 
 export const TODOS_KEY = "todos";

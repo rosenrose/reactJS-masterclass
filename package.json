@@ -32,7 +32,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "rclone purge \"deploy/Challenge\" && rclone move build \"deploy/Challenge\" && gh-pages -d deploy -t true"
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +52,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://rosenrose.github.io/reactJS-masterclass/"
+  "homepage": "https://rosenrose.github.io/reactJS-masterclass/Challenge/"
 }

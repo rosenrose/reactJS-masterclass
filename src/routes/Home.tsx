@@ -274,7 +274,7 @@ const Home = () => {
                     custom={direction[cat]}
                   >
                     {data?.results
-                      .slice(1)
+                      .slice(cat === "now_playing" ? 1 : 0)
                       .slice(ITEMS_PER_ROW * page[cat], ITEMS_PER_ROW * (page[cat] + 1))
                       .map((movie) => (
                         <Box

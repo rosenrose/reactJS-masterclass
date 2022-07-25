@@ -74,7 +74,7 @@ const Tv = () => {
     toggleSliding(category);
 
     let totalMovies = data.results.length;
-    if (category === "now_playing") {
+    if (category === "on_the_air") {
       totalMovies -= 1;
     }
     const maxPage = Math.ceil(totalMovies / ITEMS_PER_ROW);
@@ -132,7 +132,7 @@ const Tv = () => {
                     custom={direction[cat]}
                   >
                     {data?.results
-                      .slice(1)
+                      .slice(cat === "on_the_air" ? 1 : 0)
                       .slice(ITEMS_PER_ROW * page[cat], ITEMS_PER_ROW * (page[cat] + 1))
                       .map((movie) => (
                         <Box

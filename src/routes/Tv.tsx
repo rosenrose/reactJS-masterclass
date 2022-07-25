@@ -1,8 +1,8 @@
 import { AnimatePresence, useViewportScroll } from "framer-motion";
 import { useState } from "react";
-import { useQueries } from "react-query";
+import { useQueries, useQuery } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
-import { getShows, IGetShowsResult } from "../api";
+import { getShows, IGetShowsResult, getShowDetails, IShowDetails } from "../api";
 import { makeImagePath, makeLayoutId } from "../utils";
 import {
   ITEMS_PER_ROW,
@@ -28,27 +28,24 @@ import {
 } from "./Home";
 
 const Tv = () => {
-  const queryKeys: { [k: string]: string } = {
-    on_the_air: "Lastest Shows",
-    airing_today: "Airing Today",
-    popular: "Popular Shows",
-    top_rated: "Top Rated Shows",
-  };
+  const queryKeys = ["on_the_air", "airing_today", "popular", "top_rated"];
+  const categories = ["Lastest Shows", "Airing Today", "Popular Shows", "Top Rated Shows"];
+
   const queries = useQueries(
-    Object.keys(queryKeys).map((cat) => ({ queryKey: cat, queryFn: () => getShows(cat) }))
+    queryKeys.map((cat) => ({ queryKey: ["tv", cat], queryFn: () => getShows(cat) }))
   );
   // console.log(queries);
 
   const isLoading = queries.some((query) => query.isLoading);
   const queryResult = queries.map((query) => query.data as IGetShowsResult);
   const latestData = queryResult[0];
-  const dataMap = Object.fromEntries(Object.keys(queryKeys).map((cat, i) => [cat, queryResult[i]]));
+  const dataMap = Object.fromEntries(queryKeys.map((cat, i) => [cat, queryResult[i]]));
 
-  const pageMap = Object.fromEntries(Object.keys(queryKeys).map((cat) => [cat, 0]));
-  const [page, setPage] = useState(pageMap);
-
-  const slidingMap = Object.fromEntries(Object.keys(queryKeys).map((cat) => [cat, false]));
-  const [isSliding, setIsSliding] = useState(slidingMap);
+  const [page, setPage] = useState(Object.fromEntries(queryKeys.map((cat) => [cat, 0])));
+  const [isSliding, setIsSliding] = useState(
+    Object.fromEntries(queryKeys.map((cat) => [cat, false]))
+  );
+  const [direction, setDirection] = useState(Object.fromEntries(queryKeys.map((cat) => [cat, 1])));
 
   const toggleSliding = (category: string) =>
     setIsSliding((prev) => {
@@ -59,19 +56,44 @@ const Tv = () => {
 
   const navigate = useNavigate();
   const onBoxClick = (category: string, id: number) => {
-    navigate(`/tv/shows/${category}/${id}`);
+    navigate(`/tv/${category}/${id}`);
   };
-  const bigMovieMatch = useMatch("/tv/shows/:category/:id");
-  console.log(bigMovieMatch);
+  const bigMovieMatch = useMatch("/tv/:category/:id");
+  // console.log(bigMovieMatch);
 
   const { scrollY } = useViewportScroll();
 
-  const clickedMovie =
-    bigMovieMatch?.params.id &&
-    queryResult
-      .flatMap((data) => data.results)
-      .find((movie) => movie.id === parseInt(bigMovieMatch.params.id!));
+  const { data: clickedMovie } = useQuery<IShowDetails | null>(
+    ["tv", bigMovieMatch?.params.id],
+    () => getShowDetails(bigMovieMatch?.params.id)
+  );
   // console.log(clickedMovie);
+
+  const slide = (category: string, data: IGetShowsResult, direction: "left" | "right") => {
+    if (isSliding[category]) return;
+    toggleSliding(category);
+
+    let totalMovies = data.results.length;
+    if (category === "now_playing") {
+      totalMovies -= 1;
+    }
+    const maxPage = Math.ceil(totalMovies / ITEMS_PER_ROW);
+
+    setPage((prev) => {
+      const next = { ...prev };
+      next[category] =
+        direction === "left"
+          ? (next[category] + maxPage - 1) % maxPage
+          : (next[category] + 1) % maxPage;
+      return next;
+    });
+
+    setDirection((prev) => {
+      const next = { ...prev };
+      next[category] = direction === "left" ? -1 : 1;
+      return next;
+    });
+  };
 
   return (
     <Wrapper>
@@ -84,32 +106,31 @@ const Tv = () => {
             <Overview>{latestData?.results[0].overview}</Overview>
           </Banner>
           <Sliders>
-            {Object.entries(dataMap).map(([cat, data]) => (
+            {Object.entries(dataMap).map(([cat, data], i) => (
               <Slider key={cat}>
-                <Category
-                  onClick={() => {
-                    if (isSliding[cat]) return;
-                    toggleSliding(cat);
-
-                    if (data) {
-                      let totalMovies = data.results.length;
-                      if (cat === "on_the_air") {
-                        totalMovies -= 1;
-                      }
-                      const maxPage = Math.ceil(totalMovies / ITEMS_PER_ROW);
-
-                      setPage((prev) => {
-                        const next = { ...prev };
-                        next[cat] = (next[cat] + 1) % maxPage;
-                        return next;
-                      });
-                    }
-                  }}
-                >
-                  {queryKeys[cat]} ▶
+                <Category>
+                  {categories[i]}
+                  <span onClick={() => slide(cat, data, "left")} style={{ cursor: "pointer" }}>
+                    ◀
+                  </span>
+                  <span onClick={() => slide(cat, data, "right")} style={{ cursor: "pointer" }}>
+                    ▶
+                  </span>
                 </Category>
-                <AnimatePresence onExitComplete={() => toggleSliding(cat)} initial={false}>
-                  <Row key={page[cat]} {...rowVariants}>
+                <AnimatePresence
+                  onExitComplete={() => toggleSliding(cat)}
+                  initial={false}
+                  custom={direction[cat]}
+                >
+                  <Row
+                    key={page[cat]}
+                    variants={rowVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={rowVariants.transition}
+                    custom={direction[cat]}
+                  >
                     {data?.results
                       .slice(1)
                       .slice(ITEMS_PER_ROW * page[cat], ITEMS_PER_ROW * (page[cat] + 1))
@@ -150,7 +171,10 @@ const Tv = () => {
                     <>
                       <BigCover bgimage={makeImagePath(clickedMovie.poster_path!, "w500")} />
                       <BigTitle>{clickedMovie.name}</BigTitle>
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
+                      <BigOverview>
+                        <p>{clickedMovie.overview}</p>
+                        <p>First Air Date: {clickedMovie.first_air_date}</p>
+                      </BigOverview>
                     </>
                   )}
                 </BigMovie>

@@ -48,7 +48,7 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1.2;
     font-weight: 300;
     font-family: "Source Sans Pro", sans-serif;
-    background-color: #cdcdcd;
+    background-color: black;
     color: ${(props) => props.theme.white.darker};
   }
   menu, ol, ul {

@@ -1,109 +1,59 @@
-const API_KEY = process.env.REACT_APP_API_KEY;
+const API_KEY = process.env.REACT_APP_MOVIE_API_KEY;
+const BASE_PATH = "https://api.themoviedb.org/3";
+
+interface IMovie {
+  adult: boolean;
+  backdrop_path: string;
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
 
 export interface IGetMoviesResult {
-  kind: string;
-  etag: string;
-  nextPageToken: string;
-  items: {
-    kind: string;
-    etag: string;
-    id: string;
-    snippet: {
-      publishedAt: string;
-      channelId: string;
-      title: string;
-      description: string;
-      thumbnails: {
-        default: { url: string; width: number; height: number };
-        medium?: { url: string; width: number; height: number };
-        high?: { url: string; width: number; height: number };
-        standard?: { url: string; width: number; height: number };
-        maxres?: { url: string; width: number; height: number };
-      };
-      channelTitle: string;
-      playlistId: string;
-      position: number;
-      resourceId: { kind: string; videoId: string };
-      videoOwnerChannelTitle: string;
-      videoOwnerChannelId: string;
-    };
-    contentDetails: { videoId: string; videoPublishedAt: string };
-  }[];
-  pageInfo: { totalResults: number; resultsPerPage: number };
+  dates?: { maximum: string; minimum: string };
+  page: number;
+  results: IMovie[];
+  total_pages: number;
+  total_results: number;
 }
 
-export const MAX_RESULTS = 20;
+export const getMovies = (category: string) =>
+  fetch(`${BASE_PATH}/movie/${category}?api_key=${API_KEY}`).then((r) => r.json());
 
-export const getMovies = () =>
-  fetch(
-    `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=UUyWiQldYO_-yeLJC0j5oq2g&key=${API_KEY}&part=snippet,contentDetails&maxResults=${MAX_RESULTS}`
-  ).then((r) => r.json());
-
-interface IGetMovieResult {
-  kind: string;
-  etag: string;
-  items: {
-    kind: string;
-    etag: string;
-    id: string;
-    snippet: {
-      publishedAt: string;
-      channelId: string;
-      title: string;
-      description: string;
-      thumbnails: {
-        default: { url: string; width: number; height: number };
-        medium?: { url: string; width: number; height: number };
-        high?: { url: string; width: number; height: number };
-        standard?: { url: string; width: number; height: number };
-        maxres?: { url: string; width: number; height: number };
-      };
-      channelTitle: string;
-      categoryId: string;
-      liveBroadcastContent: string;
-      localized: { title: string; description: string };
-      defaultAudioLanguage: string;
-    };
-    contentDetails: {
-      duration: string;
-      dimension: string;
-      definition: string;
-      caption: string;
-      licensedContent: boolean;
-      contentRating: {};
-      projection: string;
-    };
-  }[];
-  pageInfo: { totalResults: number; resultsPerPage: number };
+interface IShow {
+  backdrop_path: string | null;
+  first_air_date?: string;
+  genre_ids: (number | undefined)[];
+  id: number;
+  name: string;
+  origin_country: (number | undefined)[];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string | null;
+  vote_average: number;
+  vote_count: number;
 }
-// fetch(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${API_KEY}&part=snippet,contentDetails`)
 
-interface ISearchResult {
-  kind: string;
-  etag: string;
-  nextPageToken: string;
-  regionCode: string;
-  pageInfo: { totalResults: number; resultsPerPage: number };
-  items: {
-    kind: string;
-    etag: string;
-    id: { kind: string; channelId?: string; videoId?: string; playlistId?: string };
-    snippet: {
-      publishedAt: string;
-      channelId: string;
-      title: string;
-      description: string;
-      thumbnails: {
-        default: { url: string; width: number; height: number };
-        medium?: { url: string; width: number; height: number };
-        high?: { url: string; width: number; height: number };
-        standard?: { url: string; width: number; height: number };
-        maxres?: { url: string; width: number; height: number };
-      };
-      channelTitle: string;
-      liveBroadcastContent: string;
-      publishTime: string;
-    };
-  }[];
+export interface IGetShowsResult {
+  page: number;
+  results: IShow[];
+  total_pages: number;
+  total_results: number;
 }
-// fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet,id&q=${query}&maxResults=20`)
+
+export const getShows = (category: string) =>
+  fetch(`${BASE_PATH}/tv/${category}?api_key=${API_KEY}`).then((r) => r.json());
+
+export const getSearchResults = (category: string, query: string) =>
+  fetch(`${BASE_PATH}/search/${category}?api_key=${API_KEY}&query=${query}`).then((r) => r.json());

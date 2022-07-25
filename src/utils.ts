@@ -1,9 +1,5 @@
-export async function getThumbnail(id: string | undefined) {
-  return id
-    ? (
-        await fetch(
-          `https://asia-northeast3-get-youtube-thumbnail.cloudfunctions.net/thumbnail?id=${id}`
-        )
-      ).text()
-    : "";
+export function makeImagePath(id: string, format?: string) {
+  return `https://image.tmdb.org/t/p/${format ?? "original"}/${id}`;
 }
+
+export const makeLayoutId = (category: string, id: number | string) => `${category}_${id}`;

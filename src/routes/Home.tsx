@@ -1,72 +1,90 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useState } from "react";
-import { useQueries, useQuery } from "react-query";
+import { useQueries } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getMovies, IGetMoviesResult, MAX_RESULTS } from "../api";
-import { getThumbnail } from "../utils";
+import { getMovies, IGetMoviesResult } from "../api";
+import { makeImagePath, makeLayoutId } from "../utils";
 
-const ROW_COUNT = 3;
-const ITEMS_PER_ROW = Math.floor(MAX_RESULTS / ROW_COUNT);
+export const ITEMS_PER_ROW = 6;
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   height: 200vh;
   padding-top: ${(props) => props.theme.headerHeight};
 `;
 
-const Loader = styled.div`
+export const Loader = styled.div`
   height: 20vh;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgimage: string | undefined }>`
-  height: 100vh;
+export const Banner = styled.div<{ bgimage: string }>`
+  height: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1.2rem;
   padding: 4rem;
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
-    url(${(props) => props.bgimage || ""});
+    url(${(props) => props.bgimage});
   background-size: cover;
   background-position: center center;
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-size: 4rem;
 `;
 
-const Overview = styled.p`
+export const Overview = styled.p`
   width: 50%;
   font-size: 1.5rem;
   text-overflow: ellipsis;
 `;
 
-const Slider = styled.div`
+export const Sliders = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15rem;
+  margin-top: 2rem;
+`;
+export const Slider = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   position: relative;
-  top: -10rem;
+
+  &:last-child {
+    margin-bottom: 20rem;
+  }
 `;
 
-const Row = styled(motion.div)`
+export const Category = styled.h2`
+  font-size: 2rem;
+  padding: 0 1rem;
+  cursor: pointer;
+`;
+
+export const Row = styled(motion.div)`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(${ITEMS_PER_ROW}, 1fr);
   gap: 0.3rem;
   position: absolute;
+  top: 4rem;
 `;
 
-const rowVariants = {
+export const rowVariants = {
   initial: { x: window.innerWidth },
   animate: { x: 0 },
   exit: { x: -1 * window.innerWidth },
   transition: { type: "tween", duration: 1 },
 };
 
-const Box = styled(motion.div)<{ bgimage: string | undefined }>`
+export const Box = styled(motion.div)<{ bgimage: string }>`
   height: 10rem;
-  background-image: url(${(props) => props.bgimage || ""});
+  background-image: url(${(props) => props.bgimage});
   background-size: cover;
   background-position: center center;
   cursor: pointer;
@@ -79,12 +97,12 @@ const Box = styled(motion.div)<{ bgimage: string | undefined }>`
   }
 `;
 
-const boxVariants = {
+export const boxVariants = {
   initial: { scale: 1 },
   whileHover: { scale: 1.3, y: -20, transition: { delay: 0.2, type: "tween" } },
 };
 
-const Info = styled(motion.div)`
+export const Info = styled(motion.div)`
   padding: 1rem;
   background-color: ${(props) => props.theme.black.lighter};
   opacity: 0;
@@ -98,11 +116,11 @@ const Info = styled(motion.div)`
   }
 `;
 
-const infoVariants = {
+export const infoVariants = {
   whileHover: { opacity: 1, transition: boxVariants.whileHover.transition },
 };
 
-const Overlay = styled(motion.div)`
+export const Overlay = styled(motion.div)`
   width: 100%;
   height: 100%;
   position: fixed;
@@ -111,7 +129,7 @@ const Overlay = styled(motion.div)`
   opacity: 0;
 `;
 
-const BigMovie = styled(motion.div)`
+export const BigMovie = styled(motion.div)`
   position: absolute;
   width: 40vw;
   height: 70vh;
@@ -123,110 +141,134 @@ const BigMovie = styled(motion.div)`
   overflow: hidden;
 `;
 
-const BigCover = styled.div`
+export const BigCover = styled.div<{ bgimage: string }>`
   width: 100%;
-  height: 50%;
+  height: 80%;
+  background-image: linear-gradient(to top, black, transparent), url(${(props) => props.bgimage});
   background-size: cover;
-  background-position: center center;
+  background-position: center 20%;
 `;
 
-const BigTitle = styled.h3`
+export const BigTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
   font-size: 2.2rem;
   margin-top: -4rem;
   padding: 1rem;
 `;
 
-const BigOverview = styled.p`
+export const BigOverview = styled.p`
   color: ${(props) => props.theme.white.lighter};
   font-size: 0.8rem;
-  padding: 1rem;
+  padding: 0 1rem;
 `;
 
 const Home = () => {
-  const { isLoading, data } = useQuery<IGetMoviesResult>("getMovies", getMovies);
-  const { data: thumbnail } = useQuery<string>("getThumbnail", () =>
-    getThumbnail(data?.items[0].contentDetails.videoId)
-  );
-
-  const [page, setPage] = useState(0);
-  const [isSliding, setIsSliding] = useState(false);
-  const toggleSliding = () => setIsSliding((prev) => !prev);
-
+  const queryKeys: { [k: string]: string } = {
+    now_playing: "Lastest Movies",
+    popular: "Popular Movies",
+    top_rated: "Top Rated Movies",
+    upcoming: "Upcoming Movies",
+  };
   const queries = useQueries(
-    (data?.items || []).slice(1).map((movie) => {
-      const id = movie.contentDetails.videoId;
-      return {
-        queryKey: id,
-        queryFn: () => getThumbnail(id).then((thumbnail) => [id, thumbnail]),
-      };
-    })
+    Object.keys(queryKeys).map((cat) => ({ queryKey: cat, queryFn: () => getMovies(cat) }))
   );
-  const thumbnails: { [key: string]: string } = Object.fromEntries(
-    queries.map((query) => query.data || [])
-  );
+  // console.log(queries);
+
+  const isLoading = queries.some((query) => query.isLoading);
+  const queryResult = queries.map((query) => query.data as IGetMoviesResult);
+  const latestData = queryResult[0];
+  const dataMap = Object.fromEntries(Object.keys(queryKeys).map((cat, i) => [cat, queryResult[i]]));
+
+  const pageMap = Object.fromEntries(Object.keys(queryKeys).map((cat) => [cat, 0]));
+  const [page, setPage] = useState(pageMap);
+
+  const slidingMap = Object.fromEntries(Object.keys(queryKeys).map((cat) => [cat, false]));
+  const [isSliding, setIsSliding] = useState(slidingMap);
+
+  const toggleSliding = (category: string) =>
+    setIsSliding((prev) => {
+      const next = { ...prev };
+      next[category] = !next[category];
+      return next;
+    });
 
   const navigate = useNavigate();
-  const onBoxClick = (id: string) => {
-    navigate(`/movies/${id}`);
+  const onBoxClick = (category: string, id: number) => {
+    navigate(`/movies/${category}/${id}`);
   };
-  const bigMovieMatch = useMatch("/movies/:id");
+  const bigMovieMatch = useMatch("/movies/:category/:id");
   // console.log(bigMovieMatch);
 
   const { scrollY } = useViewportScroll();
 
   const clickedMovie =
     bigMovieMatch?.params.id &&
-    data?.items.find((movie) => movie.contentDetails.videoId === bigMovieMatch.params.id);
+    queryResult
+      .flatMap((data) => data.results)
+      .find((movie) => movie.id === parseInt(bigMovieMatch.params.id!));
   // console.log(clickedMovie);
 
   return (
     <Wrapper>
-      {isLoading || !thumbnail ? (
+      {isLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            bgimage={thumbnail}
-            onClick={() => {
-              if (isSliding) return;
-              toggleSliding();
-
-              if (data) {
-                const totalMovies = data.items.length - 1;
-                const maxPage = Math.ceil(totalMovies / ITEMS_PER_ROW);
-                setPage((prev) => (prev + 1) % maxPage);
-              }
-            }}
-          >
-            <Title>{data?.items[0].snippet.title}</Title>
-            <Overview>{data?.items[0].snippet.description}</Overview>
+          <Banner bgimage={makeImagePath(latestData?.results[0].backdrop_path)}>
+            <Title>{latestData?.results[0].title}</Title>
+            <Overview>{latestData?.results[0].overview}</Overview>
           </Banner>
-          <Slider>
-            <AnimatePresence onExitComplete={toggleSliding} initial={false}>
-              <Row key={page} {...rowVariants}>
-                {data?.items
-                  .slice(1)
-                  .slice(ITEMS_PER_ROW * page, ITEMS_PER_ROW * (page + 1))
-                  .map((movie) => (
-                    <Box
-                      key={movie.contentDetails.videoId}
-                      bgimage={thumbnails[movie.contentDetails.videoId]}
-                      variants={boxVariants}
-                      initial="initial"
-                      whileHover="whileHover"
-                      transition={{ type: "tween" }}
-                      onClick={() => onBoxClick(movie.contentDetails.videoId)}
-                      layoutId={movie.contentDetails.videoId}
-                    >
-                      <Info variants={infoVariants}>
-                        <h4>{movie.snippet.title}</h4>
-                      </Info>
-                    </Box>
-                  ))}
-              </Row>
-            </AnimatePresence>
-          </Slider>
+          <Sliders>
+            {Object.entries(dataMap).map(([cat, data]) => (
+              <Slider key={cat}>
+                <Category
+                  onClick={() => {
+                    if (isSliding[cat]) return;
+                    toggleSliding(cat);
+
+                    if (data) {
+                      let totalMovies = data.results.length;
+                      if (cat === "now_playing") {
+                        totalMovies -= 1;
+                      }
+                      const maxPage = Math.ceil(totalMovies / ITEMS_PER_ROW);
+
+                      setPage((prev) => {
+                        const next = { ...prev };
+                        next[cat] = (next[cat] + 1) % maxPage;
+                        return next;
+                      });
+                    }
+                  }}
+                >
+                  {queryKeys[cat]} ▶
+                </Category>
+                <AnimatePresence onExitComplete={() => toggleSliding(cat)} initial={false}>
+                  <Row key={page[cat]} {...rowVariants}>
+                    {data?.results
+                      .slice(1)
+                      .slice(ITEMS_PER_ROW * page[cat], ITEMS_PER_ROW * (page[cat] + 1))
+                      .map((movie) => (
+                        <Box
+                          key={movie.id}
+                          bgimage={makeImagePath(movie.poster_path, "w500")}
+                          variants={boxVariants}
+                          initial="initial"
+                          whileHover="whileHover"
+                          transition={{ type: "tween" }}
+                          onClick={() => onBoxClick(cat, movie.id)}
+                          layoutId={makeLayoutId(cat, movie.id)}
+                        >
+                          <Info variants={infoVariants}>
+                            <h4>{movie.title}</h4>
+                          </Info>
+                        </Box>
+                      ))}
+                  </Row>
+                </AnimatePresence>
+              </Slider>
+            ))}
+          </Sliders>
           <AnimatePresence>
             {bigMovieMatch && (
               <>
@@ -235,18 +277,15 @@ const Home = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 />
-                <BigMovie layoutId={bigMovieMatch.params.id} style={{ top: scrollY.get() + 100 }}>
+                <BigMovie
+                  layoutId={makeLayoutId(bigMovieMatch.params.category!, bigMovieMatch.params.id!)}
+                  style={{ top: scrollY.get() + 100 }}
+                >
                   {clickedMovie && (
                     <>
-                      <BigCover
-                        style={{
-                          backgroundImage: `linear-gradient(to top, black, transparent), url(${
-                            thumbnails[clickedMovie.contentDetails.videoId]
-                          })`,
-                        }}
-                      />
-                      <BigTitle>{clickedMovie.snippet.title}</BigTitle>
-                      <BigOverview>{clickedMovie.snippet.description}</BigOverview>
+                      <BigCover bgimage={makeImagePath(clickedMovie.poster_path, "w500")} />
+                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigOverview>{clickedMovie.overview}</BigOverview>
                     </>
                   )}
                 </BigMovie>

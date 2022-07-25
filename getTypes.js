@@ -1,5 +1,5 @@
 function getTypes(obj) {
-  if (typeof obj === "object") {
+  if (typeof obj === "object" && obj !== null) {
     if (Array.isArray(obj)) {
       const types = Array.from(new Set(obj.map((e) => getTypes(e))));
       let result = "";
@@ -23,23 +23,27 @@ function getTypes(obj) {
         .replace(/\s?\\n?\s?|"(?=\(|\{)|(?<=(\}|\]))"/g, "");
     }
   } else {
-    return typeof obj;
+    return obj === null ? "null" : typeof obj;
   }
 }
 
-[
-  `https://api.coinpaprika.com/v1/coins/btc-bitcoin`,
-  `https://api.coinpaprika.com/v1/tickers/btc-bitcoin`,
-].forEach((url) => {
-  fetch(url)
-    .then((response) => response.json())
-    .then((json) => {
-      console.log(json, getTypes(json), objectToEntries(json));
-    });
-});
+const path = "https://api.themoviedb.org/3";
+const key = "";
+
+["movie", "tv"]
+  .map((cat) => [cat, `${path}/search/${cat}?api_key=${key}&query=action`])
+  .forEach(([cat, url]) => {
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) => {
+        // console.log(json, getTypes(json), objectToEntries(json));
+        console.log(url, getTypes(json));
+        document.querySelector(`#${cat}`).textContent = getTypes(json);
+      });
+  });
 
 function objectToEntries(obj) {
-  if (typeof obj === "object") {
+  if (typeof obj === "object" && obj !== null) {
     if (Array.isArray(obj)) {
       return obj.map((value) => objectToEntries(value));
     } else {

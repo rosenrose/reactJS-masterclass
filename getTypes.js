@@ -30,8 +30,8 @@ function getTypes(obj) {
 const path = "https://api.themoviedb.org/3";
 const key = "";
 
-["movie", "tv"]
-  .map((cat) => [cat, `${path}/search/${cat}?api_key=${key}&query=action`])
+["search"]
+  .map((cat) => [cat, `${path}/search/multi?api_key=${key}&query=action`])
   .forEach(([cat, url]) => {
     fetch(url)
       .then((response) => response.json())

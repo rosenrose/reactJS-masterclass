@@ -55,5 +55,19 @@ export interface IGetShowsResult {
 export const getShows = (category: string) =>
   fetch(`${BASE_PATH}/tv/${category}?api_key=${API_KEY}`).then((r) => r.json());
 
+export interface ISearchMovieResult {
+  page: number;
+  results: IMovie[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ISearchTvResult {
+  page: number;
+  results: IShow[];
+  total_pages: number;
+  total_results: number;
+}
+
 export const getSearchResults = (category: string, query: string) =>
   fetch(`${BASE_PATH}/search/${category}?api_key=${API_KEY}&query=${query}`).then((r) => r.json());
